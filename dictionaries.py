@@ -1,3 +1,9 @@
+#################################################
+#dictionary.py
+#
+# Your name: Chieri Nnadozi
+# Your andrew id: cnnadozi
+#################################################
 dictSynonyms = {
     'happy': 
         {
@@ -60,11 +66,9 @@ dictonaryMood = {
 
 }
 
-
-
 dictionaryState = {
 
     'awake': {'alive','attentive','aware','cognizant','vigilant'}
 
-
 }
+

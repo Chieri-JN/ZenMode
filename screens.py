@@ -4,7 +4,8 @@
 # Your name: Chieri Nnadozi
 # Your andrew id: cnnadozi
 #################################################
- 
+
+from cmu_112_graphics import *
 import classes as cl
 import dictionaries as dict
 import random 
@@ -22,15 +23,24 @@ def randomHexGenerator():
         colour += random.choice(HexAlpha)
     return '#' + colour
 
-def distance(x1, y1, x2, y2): # DONE
+# Taken from hw1
+def distance(x1, y1, x2, y2): 
     x = (x2 - x1)**2
     y = (y2 - y1)**2
     return math.sqrt(x + y)
 
-def circlesIntersect(x1, y1, r1, x2, y2, r2): # DONE
-    if (r1 + r2) < distance(x1, y1, x2, y2):
-        return False
-    return True
+# Taken from hw1
+def circlesIntersect(x1, y1, r1, x2, y2, r2): 
+    return not (r1 + r2) < distance(x1, y1, x2, y2)
+
+# Perfect elsastic collision of two balls 
+def elasticCollision():
+    pass
+
+def areaCircle():
+    pass
+
+
 
 ##########################################
 # Spalsh Screen / Start Mode
@@ -38,9 +48,21 @@ def circlesIntersect(x1, y1, r1, x2, y2, r2): # DONE
 
 def startScreen_redrawAll(app,canvas):
     font = ''
+    canvas.create_rectangle()
 
 
+def startScreen_timerFired(app):
+    #moveBall(app)
     pass
+
+
+# NOTE Use timerFired to have colour gradually change (cycle through colours
+# cycle through RGB colours)
+# Have circles, randomly generated and drifting across screen, slightly light/
+# darker than actually bg colour()
+# OR have bg be paler shade(pastel) of circle colour  
+# scatter function/transition function for when I screen is changed
+
 
 ##########################################
 # Quiz Screens / Start Mode
@@ -49,6 +71,8 @@ def startScreen_redrawAll(app,canvas):
 # Colour Wheel
 def moodWheel_redrawAll(app,canvas):
     pass
+
+# NOTE USE DISCTANCE TO CALCULATE location from circumfrence of circle
 
 # Word Selection
 def wordSelectorScreen_redrawAll(app,canvas):

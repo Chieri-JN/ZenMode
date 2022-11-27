@@ -37,6 +37,8 @@ def appStarted(app):
     app.dictionary = dict.dictonaryMood  
     # keys will be words that lead to set of synonymes
     app.selectedWord = None
+    app.treebranches = []
+    app.buttons = []
  
 def timerFired(app):
     pass

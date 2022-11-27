@@ -17,7 +17,20 @@ dictSynonyms = {
          'bitter', 'dismal', 'melancholic', 'mournful', 'pessimistic', 'somber',
          'sorrowful', 'sorry', 'unhappy', 'blue', 'cheerless', 'dejected',
          'depressed'
-        }
+        },
+
+    'stressed' : {},
+    'sleepy': {},
+    'tired' : {},
+    'relaxed' : {},
+    'restless' : {},
+    'angry' : {},
+    'calm' : {},
+    'numb' : {},
+    'irritaded' : {},
+    'unimpressed': {},
+    'mellow' : {}
+    
 }
 
 dicAntonyms = {
@@ -32,7 +45,19 @@ dicAntonyms = {
         {
          'cheerful','glad','happy','hopeful', 'joyful', 'cheerful', 'overjoyed',
          'joyful'
-        }
+        },
+
+    'stressed' : {},
+    'sleepy': {},
+    'tired' : {},
+    'relaxed' : {},
+    'restless' : {},
+    'angry' : {},
+    'calm' : {},
+    'numb' : {},
+    'irritaded' : {},
+    'unimpressed': {},
+    'mellow' : {}
 
 }
 
@@ -41,27 +66,28 @@ dictonaryMood = {
 
     'sad':  (dictSynonyms['sad'], dicAntonyms['sad']),
 
-    'stressed' : {},
+    'stressed' : (dictSynonyms['stressed'], dicAntonyms['stressed']),
 
-    'sleepy': {},
+    'sleepy': (dictSynonyms['sleepy'], dicAntonyms['sleepy']),
 
-    'tired' : {},
+    'tired' : (dictSynonyms['tired'], dicAntonyms['tired']),
 
-    'relaxed' : {},
+    'relaxed' : (dictSynonyms['relaxed'], dicAntonyms['relaxed']),
 
-    'restless' : {},
+    'restless' : (dictSynonyms['restless'], dicAntonyms['restless']),
 
-    'angry' : {},
+    'angry' : (dictSynonyms['angry'], dicAntonyms['angry']),
 
-    'calm' : {},
+    'calm' : (dictSynonyms['calm'], dicAntonyms['calm']),
 
-    'numb' : {}, # Lol Me
+    'numb' : (dictSynonyms['numb'], dicAntonyms['numb']),
 
-    'irritaded' : {},
+    'irritaded' : (dictSynonyms['irritaded'], dicAntonyms['irritaded']),
 
-    'unimpressed' : {}, # this should be an easter egg 'Surely you don't mean TP
+    # this should be an easter egg 'Surely you don't mean by my TP'
+    'unimpressed' : (dictSynonyms['unimpressed'], dicAntonyms['unimpressed']), 
 
-    'mellow' : {}
+    'mellow' : (dictSynonyms['mellow'], dicAntonyms['mellow']),
 
 
 }

@@ -83,7 +83,7 @@ class Synonyme(Word):
 
 class Antonyme(Word):
     pass
-
+# 
 #################################################
 # Button Class
 #################################################
@@ -103,11 +103,11 @@ class Button:
         self.text = text
         self.font = font
 
-    # takes in function and returns function 
+    # 
     # def buttonPressed(self):
     #     print('Button was pressed')
     #     return self.function
-
+    # takes in function and returns function 
     def buttonPressed(self,function):
         print('Button was pressed')
         return function
@@ -236,5 +236,5 @@ def mouseMoved(app, event):
     #     branch.draw(canvas)
 
 
-# runApp(width=800, height=800)
+#runApp(width=800, height=800)
     

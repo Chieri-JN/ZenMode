@@ -55,6 +55,8 @@ def drawRandomShapes(shape,rate,bounds):
 ##########################################
 # Main App
 ##########################################
+
+testText = cl.Word(tx.helpText1)
 # for buttons
 def switchMode(app,mode,colour):
     app.screenColour = colour
@@ -89,7 +91,7 @@ def appStarted(app):
     app.text1 = cl.Word(tx.helpText1)
     app.text2 = cl.Word(tx.helpText2)
     app.text3 = cl.Word(tx.helpText3)
-    app.helpText= app.text1
+    app.helpText= testText
 
     # pause screen unique App values
     # NOTE CHANGE LOCATION VALUES

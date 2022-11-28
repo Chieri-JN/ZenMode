@@ -11,7 +11,6 @@ helpText2 = """"
 Use the 'Left' and 'Right' arrow keys to move your player from side to side. Use
 the 'Up' arrow key or 'Spacebar' to jump. While in the game hittting 'P' will 
 pause the game. 
-
 """
 
 

@@ -43,6 +43,9 @@ def appStarted(app):
 def timerFired(app):
     pass
 
+
+
+
  # NOTE FOR LATER
  # just use hard check of if word is positve or neg in meaning(i.e. word in neg/pos)
  # 

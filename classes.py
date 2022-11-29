@@ -10,6 +10,7 @@ import math
 import random
 import string
 import dictionaries as dict
+import texts_colours as col
 
 #################################################
 # Helper functions
@@ -83,6 +84,9 @@ class Synonyme(Word):
 
 class Antonyme(Word):
     pass
+
+class WordBubble(Word):
+    pass
 # 
 #################################################
 # Button Class
@@ -152,7 +156,7 @@ class MoodWheel():
         self.cy = cy
         self.r = r 
 
-    def drawColoutWheel(self,canvas):
+    def drawColourWheel(self,canvas):
         canvas.create_oval(self.cx-(self.r+10),self.cy-(self.r+10),
                            self.cx+(self.r+10),self.cy+(self.r+10),
                            fill='yellow',width=5, outline='grey46')
@@ -161,23 +165,39 @@ class MoodWheel():
         for i in range(360,0):
             if i % 2 == 0:
                 canvas.create_arc(self.cx-self.r,self.cy-self.r,self.cx+self.r,
-                                  self.cy+self.r, fill="black", 
+                                  self.cy+self.r, fill=co.coloursList[i], 
                                   outline = '', style="pieslice",start=i,
                                   extent=i)
-            else:
-                canvas.create_arc(self.cx-self.r,self.cy-self.r,self.cx+self.r,
-                                  self.cy+self.r,fill="blue", 
-                                  outline = '', style="pieslice", start=i,
-                                  extent=i)
+
 
 
     def inBounds(self,x,y):
         #NOTE Taken from dot class example
         return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r)
 
+#################################################
+# Circle Class
+#################################################
+class Circle():
+    def __init__(self,cx,cy,r):
+        self.cx = cx
+        self.cy = cy
+        self.r = r
 
+    def draw(self,canvas):
+        pass
 
+    def inBounds(self,x,y):
+        #NOTE Taken from dot class example
+        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r)
 
+    def circleMove(self,dx,dy):
+        self.cx += dx
+        self.cy += dy
+
+    def circleDrag(self,x,y):
+        self.cx += x
+        self.cy += y
 
 
 """THE FOLLOWING CODE IS TEST CODE AND WILL BE REMOVED IN FINAL PRODUCT"""

@@ -50,4 +50,4 @@ def timerFired(app):
  # just use hard check of if word is positve or neg in meaning(i.e. word in neg/pos)
  # 
 
-runApp(width=1200, height=900)
+# runApp(width=1200, height=900)

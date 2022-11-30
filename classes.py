@@ -86,8 +86,32 @@ class Antonyme(Word):
     pass
 
 class WordBubble(Word):
-    pass
-# 
+    def __init__(self,cx,cy,r,colour,width,outline):
+        # super().__init__(cx)
+        self.cx = cx
+        self.cy = cy
+        self.r = r
+        self.colour = colour
+        self.width = width
+        self.outline = outline
+
+    def inBounds(self,x,y):
+        #NOTE Taken from dot class example
+        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r-16)
+
+    def draw(self,canvas,font):
+        canvas.create_oval(self.cx-self.r,self.cy-self.r,
+                           self.cx+self.r,self.cy+self.r,
+                           fill=self.colour,width=self.width, outline=self.outline,
+                           text=f'{self.word}', font=font)
+
+    def wordBubblePressed(self):
+        return self.word
+
+    def Move(self,dx,dy):
+        self.cx += dx
+        self.cy += dy
+
 #################################################
 # Button Class
 #################################################
@@ -126,8 +150,7 @@ class Button:
                                 self.x1, self.y1, fill=self.colour, 
                                 activefill=self.colour2, 
                                 width = self.outlinewidth, outline=self.outline)
-        if self.text != '':
-            canvas.create_text(self.x0, self.y0,
+        canvas.create_text(self.x0, self.y0,
                                 text=self.text, font=f'{self.font}',
                                 fill=self.outline)
 
@@ -147,6 +170,30 @@ class Tree:
             self.drawBranch(depth-1)
 
 #################################################
+# Pieslice Class
+#################################################
+
+class PieSlice():
+    def __init__(self,cx,cy,r,colour,start):
+        self.cx = cx
+        self.cy = cy
+        self.r = r 
+        self.colour = colour
+        self.start = start # = i
+
+    def draw(self,canvas):
+         canvas.create_arc(self.cx-self.r,self.cy-self.r, self.cx+self.r,
+                                  self.cy+self.r, fill=self.colour, 
+                                  outline = '', style="pieslice",start=self.start,
+                                  extent=360-self.start)
+    def getColour(self):
+        return self.colour
+    
+    def inBounds(self):
+        # figure out
+        pass
+
+#################################################
 # MoodWheel Class
 #################################################
 
@@ -155,50 +202,79 @@ class MoodWheel():
         self.cx = cx
         self.cy = cy
         self.r = r 
+        self.listOfSlices = []
+        self.width = 10
 
     def drawColourWheel(self,canvas):
         canvas.create_oval(self.cx-(self.r+10),self.cy-(self.r+10),
                            self.cx+(self.r+10),self.cy+(self.r+10),
-                           fill='yellow',width=5, outline='grey46')
+                           fill='grey60',width=self.width, outline='grey26')
 
         # Fix LATER
-        for i in range(360,0):
-            if i % 2 == 0:
-                canvas.create_arc(self.cx-self.r,self.cy-self.r,self.cx+self.r,
-                                  self.cy+self.r, fill=co.coloursList[i], 
-                                  outline = '', style="pieslice",start=i,
-                                  extent=i)
+        for i in range(0,len(col.coloursList)):
+            degree = PieSlice(self.cx, self.cy, self.r+self.width/2,col.coloursList[i],i)
+            # canvas.create_arc(self.cx-self.r,self.cy-self.r, self.cx+self.r,
+            #                       self.cy+self.r, fill=col.coloursList[i], 
+            #                       outline = '', style="pieslice",start=i,
+            #                       extent=360-i)
+            degree.draw(canvas)
+            self.listOfSlices.append(degree)
 
-
-
+            
     def inBounds(self,x,y):
         #NOTE Taken from dot class example
-        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r)
+        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r-16)
 
 #################################################
 # Circle Class
 #################################################
 class Circle():
-    def __init__(self,cx,cy,r):
+    def __init__(self,cx,cy,r, colour,width,outline):
         self.cx = cx
         self.cy = cy
         self.r = r
+        self.colour = colour
+        self.width = width
+        self.outline = outline
 
     def draw(self,canvas):
-        pass
+        canvas.create_oval(self.cx-self.r,self.cy-self.r,
+                           self.cx+self.r,self.cy+self.r,
+                           fill=self.colour,width=self.width, outline=self.outline)
 
     def inBounds(self,x,y):
         #NOTE Taken from dot class example
         return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r)
 
-    def circleMove(self,dx,dy):
+    def Move(self,dx,dy):
         self.cx += dx
         self.cy += dy
 
-    def circleDrag(self,x,y):
-        self.cx += x
-        self.cy += y
+    def Drag(self,x,y):
+        self.cx = x
+        self.cy = y
 
+
+class Box():
+    def __init__(self,x, y, h, w, colour, outlinewidth, outline):
+        self.width = w/2 # NOTE this /2 esnures that the inputed w/h is the
+        self.height = h/2 # NOTE entire button and not the w/h from centerpoint
+        self.x0 = x 
+        self.y0 = y 
+        self.x1 = self.x0 + self.width
+        self.y1 = self.y0  + self.height
+        self.colour = colour
+        self.outlinewidth = outlinewidth
+        self.outline = outline
+    
+    # NOTE remove activefill
+    def draw(self, canvas):
+        canvas.create_rectangle(self.x0 - self.width,self.y0 - self.height, 
+                                self.x1, self.y1, fill=self.colour,  
+                                width = self.outlinewidth, outline=self.outline)
+
+    def inBounds(self, x, y):
+        return (self.x0 <= x <= self.x1) and (self.y0 <= y <= self.y1)
 
 """THE FOLLOWING CODE IS TEST CODE AND WILL BE REMOVED IN FINAL PRODUCT"""
 def message():
@@ -213,7 +289,7 @@ def appStarted(app):
     app.check = False
 
     newButton = Button(100, 200, 70, 120, 'green', 'lightGreen', 3, 'white',
-                       "Button",'Krungthep 20',message())
+                       "Button",'Krungthep 20')
     app.buttons.append(newButton)
     
 for key in dict.dictonaryMood:
@@ -235,6 +311,8 @@ def mousePressed(app,event):
     return 'Not a Button!'
     
 # def redrawAll(app, canvas):
+#     mood1 = MoodWheel(app.width/2-300,550,190)
+#     mood1.drawColourWheel(canvas)
 #     testword.drawWord(canvas,100,50,'Krungthep 26','red')
 
 #     for i in range(len(app.words)):
@@ -256,5 +334,5 @@ def mouseMoved(app, event):
     #     branch.draw(canvas)
 
 
-#runApp(width=800, height=800)
+# runApp(width=800, height=800)
     

@@ -31,8 +31,8 @@ quiz1Text1 = """
 """
 
 
-colours = """ 
-#ff0000
+colours = """#ff0000
+#FF0000
 #FF0004
 #FF0008
 #FF000C
@@ -379,6 +379,20 @@ colours = """
 #FF0B00
 #FF0300
 #FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0000
+#FF0004
 """
 
 coloursList = []
@@ -757,3 +771,29 @@ for colour in pastelColours.splitlines():
 
 # print(pastelColoursList)
 
+pastelColoursTwo = """#CAFFA3
+#D4FFA1
+#DFFF9E
+#EAFF9C
+#F7FF9A
+#FFFF98
+#FFFF95
+#FFFB93
+#FFEF91
+#FFE38E
+#FFD58C
+#FFC68A
+#FFB687
+#FFA585
+#FF9383
+#FF8181
+#FF7E8F
+#FF7CA0
+#FF7AB1
+#FF77C3
+#FF75D5
+"""
+
+pastelColoursTwoList = []
+for colour in pastelColoursTwo.splitlines():
+    pastelColoursTwoList.append(colour)

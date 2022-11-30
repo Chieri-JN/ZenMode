@@ -14,7 +14,6 @@ import dictionaries as dict
 import random 
 import string
 import math
-
 ##########################################
 # Helper Functions
 ##########################################
@@ -61,9 +60,10 @@ def switchMode(app,mode,colour,title):
 
 def appStarted(app):
     app.timerDelay = 200
-    app.mode = 'quizScreenOne'
+    app.mode = 'quizScreenTwo'
     app._title = 'ZenMode'
     app.tick = 0
+    app.mouseMovedDelay = 0
     app.gameStarted = False # prevents going from help to pause without staring the game
     app.gameOver = False 
     # SET to NONE
@@ -71,7 +71,8 @@ def appStarted(app):
     app.screenColour = "#c8eed5"
     app.centerx = app.width/2
     app.centery = app.height/2
-    app.selectedWord = None
+    app.selectedWord = 'None'
+    app.mass = 10
 
     # startScreen unique App values
     app.Startbuttons = []
@@ -83,15 +84,27 @@ def appStarted(app):
     app.Startbuttons.extend([app.startButton,app.helpButton])
 
     # quiz1 Screen unique App values
+    app.mood1 = cl.MoodWheel(app.centerx-300,550,190)
+    app.circlex = app.centerx-300
+    app.circley = 550
+    app.circle1 = cl.Circle(app.circlex,app.circley, 20,'white',0,'')
+    app.currMood = 'Neutral'
+    app.mood = cl.Word(app.currMood)
+    app.cwCirclePos = (app.circlex,app.circley)
     app.quiz1Buttons = []
-    app.mood = 'Neutral'
-
-    app.quiz1Buttons.extend([])
+    # buttons
+    app.selectMoodButton = cl.Button(app.centerx+200, 650, 80, 150,'#e68800','#ffa11a',5,
+                            'white','Select','Krungthep 30')
+    app.quiz1Buttons.extend([app.selectMoodButton])
 
     # quiz2 Screen unique App values
     app.quiz2Buttons = []
 
-    app.quiz2Buttons.extend([])
+    app.chooseWordButton = cl.Button(app.centerx+200, 650, 80, 150,'#e68800','#ffa11a',5,
+                            'white','Choose','Krungthep 30')
+    app.refreshWordButton = cl.Button(app.centerx+200, 750, 80, 150,'#e68800','#ffa11a',5,
+                            'white','Refresh','Krungthep 30')
+    app.quiz2Buttons.extend([app.chooseWordButton,app.refreshWordButton])
 
     # quiz3 Screen unique App values
     app.quiz3Buttons = []
@@ -104,7 +117,6 @@ def appStarted(app):
     app.text2 = cl.Word(tx.helpText2)
     app.text3 = cl.Word(tx.helpText3)
     app.helpText = 1
-
 
     # pause screen unique App values
     app.pauseButtons = []
@@ -201,15 +213,17 @@ def startScreen_timerFired(app):
 # drawWord(self, canvas, x, y, font, colour)
 def quizScreenOne_redrawAll(app,canvas):
     canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
+    app.mood1.drawColourWheel(canvas)
 
-    mood1 = cl.MoodWheel(app.centerx-300,550,190)
-    mood1.drawColourWheel(canvas)
+    drawCircle(app,canvas)
 
-    header1 = cl.Word('Hello')
+    header1 = cl.Word('Hello,')
     header2 = cl.Word('How are you feeling today?')
     header3 = cl.Word('Current Mood:')
 
-    mood = cl.Word(app.mood)
+
+    for button in app.quiz1Buttons:
+        button.draw(canvas)
 
     header1.drawWord(canvas,app.centerx-370,100,'K2D 120','grey54') #shadow
     header1.drawWord(canvas,app.centerx-375,100,'K2D 120','white')
@@ -219,19 +233,43 @@ def quizScreenOne_redrawAll(app,canvas):
     header3.drawWord(canvas,app.centerx+205,370,'K2D 70','grey54')
     header3.drawWord(canvas,app.centerx+200,370,'K2D 70','white')
 
-    mood.drawWord(canvas,app.centerx+205,540,'K2D 70','gray65')
-    mood.drawWord(canvas,app.centerx+200,540,'K2D 70','gray99')
+    # will change when ball is moved
+    app.mood.drawWord(canvas,app.centerx+205,510,'K2D 70','gray65')
+    app.mood.drawWord(canvas,app.centerx+200,510,'K2D 70','gray99')
+    canvas.create_line(app.centerx+85,560,app.centerx+330,
+                       560,fill='gray65',width=8, smooth=True)
+    canvas.create_line(app.centerx+80,555,app.centerx+325,
+                       555,fill='grey99',width=8, smooth=True)
+
+def drawCircle(app, canvas):
+    app.circle1.Drag(app.circlex,app.circley)
+    app.circle1.draw(canvas)
+
+
+# NOTE gets stuck if collides with border, try and shift pos or prevent collision
+def quizScreenOne_mouseDragged(app,event):
+    if app.mood1.inBounds(app.circlex,app.circley):
+        if app.circle1.inBounds(event.x,event.y):
+            app.circlex,app.circley = event.x, event.y
 
 # NOTE USE DISCTANCE TO CALCULATE location from circumfrence of circle
-def quizScreenOne_mouseDragged(app,event):
-    pass
 def quizScreenOne_mouseReleased(app,event):
-    pass
+    if app.mood1.inBounds(event.x,event.y):
+        if app.circle1.inBounds(event.x,event.y):
+            app.cwCirclePos = (event.x,event.y)
+        # USE COORDINATE TO ASSIGN MOOD/COLOUR
+        print(app.cwCirclePos)
+        
+
 def quizScreenOne_mousePressed(app,event):
-    pass
+    if app.selectMoodButton.inBounds(event.x, event.y): 
+        if app.cwCirclePos != (app.centerx-300,550):
+            app.startButton.buttonPressed(switchMode(app,'quizScreenTwo','#d8d4f1','quizScreen2'))
+            print('Select Mood button pressed!')
+        else:
+            print('Please choose your mood')
 
-
-# NOTE will change modd
+# NOTE will change mood
 def moodChange(app):
     app.mood = 'New Mood'
     return app.mood
@@ -255,9 +293,34 @@ def quizScreenOne_timerFired(app):
 ##########################################
 def quizScreenTwo_redrawAll(app,canvas):
     canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
+
+    header1 = cl.Word('What word best fits your mood?')
+    
+
+    header1.drawWord(canvas,app.centerx,100,'K2D 80','grey44') #shadow
+    header1.drawWord(canvas,app.centerx-5,100,'K2D 80','white')
+
+    drawH3(app,canvas)
+
+    box = cl.Box(app.centerx-200, 500, 450, 650, '#c1daf0', 10, '#225d91')
+    box.draw(canvas)
+
+    for button in app.quiz2Buttons:
+        button.draw(canvas)
+
+def drawH3(app,canvas):
+    header3 = cl.Word(f'Chosen Word:\n {app.selectedWord}')
+    header3.drawWord(canvas,app.centerx+200,320,'K2D 50','grey44') #shadow
+    header3.drawWord(canvas,app.centerx+196,320,'K2D 50','white')
+
 def quizScreenTwo_timerFired(app):
+
     pass
+
 def quizScreenTwo_mousePressed(app,event):
+
+
+
     pass
 
 

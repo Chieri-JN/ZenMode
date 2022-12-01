@@ -14,6 +14,7 @@ import dictionaries as dict
 import random 
 import string
 import math
+import time
 ##########################################
 # Helper Functions
 ##########################################
@@ -59,16 +60,18 @@ def switchMode(app,mode,colour,title):
     
 
 def appStarted(app):
-    app.timerDelay = 200
-    app.mode = 'quizScreenTwo'
+    app.mode = 'gameScreen'
     app._title = 'ZenMode'
+    # NOTE ORIGINAL #c8eed5
+    app.screenColour = "#c8eed5"
+    app.timerDelay = 200
     app.tick = 0
-    app.mouseMovedDelay = 0
+    app.mouseMovedDelay = -10
     app.gameStarted = False # prevents going from help to pause without staring the game
     app.gameOver = False 
     # SET to NONE
-    app.gameOutcome = 'None'
-    app.screenColour = "#c8eed5"
+    app.gameOutcome = 'Loss'
+    
     app.centerx = app.width/2
     app.centery = app.height/2
     app.selectedWord = 'None'
@@ -98,18 +101,29 @@ def appStarted(app):
     app.quiz1Buttons.extend([app.selectMoodButton])
 
     # quiz2 Screen unique App values
-    app.quiz2Buttons = []
+    app.WordList = []
+    # for word in dict.dictonaryMood:
+    #     wordbubble = cl.WordBubble(word,)
+    #     app.WordList.append(wordbubble)
 
-    app.chooseWordButton = cl.Button(app.centerx+200, 650, 80, 150,'#e68800','#ffa11a',5,
+    # buttons
+    app.quiz2Buttons = []
+    app.chooseWordButton = cl.Button(app.centerx+340, 500, 80, 150,'#a89fe0','#cbc5ec',5,
                             'white','Choose','Krungthep 30')
-    app.refreshWordButton = cl.Button(app.centerx+200, 750, 80, 150,'#e68800','#ffa11a',5,
+    app.refreshWordButton = cl.Button(app.centerx+340, 650, 80, 150,'#a89fe0','#cbc5ec',5,
                             'white','Refresh','Krungthep 30')
     app.quiz2Buttons.extend([app.chooseWordButton,app.refreshWordButton])
 
     # quiz3 Screen unique App values
-    app.quiz3Buttons = []
+   
+    app.dotColour = random.choice(col.coloursTwoList)
+    app.dotCount = 0
+    app.dots = []
 
-    app.quiz3Buttons.extend([])
+    app.quiz3Buttons = []
+    app.quiz3StartButton = cl.Button(app.centerx, app.centery, 115, 250,'#ff4d5a','#ffb3b8',5,
+                            'white','Start','Krungthep 70')
+    app.quiz3Buttons.extend([app.quiz3StartButton])
 
     # help screen unique App values
     #text
@@ -134,6 +148,9 @@ def appStarted(app):
     app.pauseButtons.extend([app.pauseHelpButton,app.exitGameButton,
                              app.resumeGameButton])
 
+    # game screen unique App values
+
+    app.player = cl.Player(app.centerx,700)
 
 ##########################################
 # Start Screen
@@ -181,11 +198,10 @@ def startScreen_mousePressed(app,event):
         print('Start button pressed!')
 
     if app.helpButton.inBounds(event.x, event.y):
-        app.startButton.buttonPressed(switchMode(app,'helpScreen','#96c9a6','helpScreen'))
+        app.helpButton.buttonPressed(switchMode(app,'helpScreen','#96c9a6','helpScreen'))
         print('Help button pressed!')
 
     # app.setSize(newWidth, newHeight) NOTE use to change canvas size
-    pass
 
 def bgColourChange(app):
     return col.pastelColoursList[app.tick%len(col.pastelColoursList)]
@@ -264,7 +280,7 @@ def quizScreenOne_mouseReleased(app,event):
 def quizScreenOne_mousePressed(app,event):
     if app.selectMoodButton.inBounds(event.x, event.y): 
         if app.cwCirclePos != (app.centerx-300,550):
-            app.startButton.buttonPressed(switchMode(app,'quizScreenTwo','#d8d4f1','quizScreen2'))
+            app.selectMoodButton.buttonPressed(switchMode(app,'quizScreenTwo','#d8d4f1','quizScreen2'))
             print('Select Mood button pressed!')
         else:
             print('Please choose your mood')
@@ -294,15 +310,14 @@ def quizScreenOne_timerFired(app):
 def quizScreenTwo_redrawAll(app,canvas):
     canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
 
-    header1 = cl.Word('What word best fits your mood?')
+    header1 = cl.Word('What word best\ndescribes your mood?')
     
-
     header1.drawWord(canvas,app.centerx,100,'K2D 80','grey44') #shadow
     header1.drawWord(canvas,app.centerx-5,100,'K2D 80','white')
 
     drawH3(app,canvas)
 
-    box = cl.Box(app.centerx-200, 500, 450, 650, '#c1daf0', 10, '#225d91')
+    box = cl.Box(app.centerx-200, 500, 450, 650, '#8578d3', 10, '#6252c7')
     box.draw(canvas)
 
     for button in app.quiz2Buttons:
@@ -310,18 +325,25 @@ def quizScreenTwo_redrawAll(app,canvas):
 
 def drawH3(app,canvas):
     header3 = cl.Word(f'Chosen Word:\n {app.selectedWord}')
-    header3.drawWord(canvas,app.centerx+200,320,'K2D 50','grey44') #shadow
-    header3.drawWord(canvas,app.centerx+196,320,'K2D 50','white')
+    header3.drawWord(canvas,app.centerx+340,320,'K2D 50','grey44') #shadow
+    header3.drawWord(canvas,app.centerx+336,320,'K2D 50','white')
 
 def quizScreenTwo_timerFired(app):
 
     pass
 
-def quizScreenTwo_mousePressed(app,event):
-
-
-
+def chooseWords():
+    # choose 6 words from list at random
     pass
+
+def quizScreenTwo_mousePressed(app,event):
+    if app.chooseWordButton.inBounds(event.x, event.y):
+        app.chooseWordButton.buttonPressed(switchMode(app,'quizScreenThree','#ff8c95','quizScreen3'))
+        print('Choose word button pressed!')
+
+    if app.refreshWordButton.inBounds(event.x, event.y):
+        app.refreshWordButton.buttonPressed(chooseWords())
+        print('Refresh word button pressed!')
 
 
 #NOTE remove Later
@@ -335,15 +357,49 @@ def quizScreenTwo_keyPressed(app,event):
         app.mode = 'quizScreenThree'
         app._title = 'quizScreen3'
 
-#Reflexes/Other
+# Reflexes
 ##########################################
+
+# NOTE this screen will determine the overall speed of the player and falling word
+# will use time.time to calc start and end time through how quickly player can click on
+# 5 appearing points of a specfic colour . This time gotten will be the denominator for object
+# speeds
+# TODO # circles will appear on screen, different colours
+# count of correct clicks (need to store and match colour)
+# once 5 points obtained, display start button
+
 def quizScreenThree_redrawAll(app,canvas):
     canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
-def quizScreenThree_timerFired(app):
-    pass
-def quizScreenThree_mousePressed(app,event):
+
+    if app.dotCount < 5:
+        header1 = cl.Word(f'Click 5 {app.dotColour.capitalize()} dots!')
+        header1.drawWord(canvas,app.centerx,100,'K2D 80','grey44') #shadow
+        header1.drawWord(canvas,app.centerx-5,100,'K2D 80','white')
+
+        drawDots(app,canvas)
+        
+    elif app.dotCount >= 5:
+        drawStartButton(app,canvas)
+
+def drawStartButton(app,canvas):
+    for button in app.quiz3Buttons:
+        button.draw(canvas)
+
+def drawDots(app,canvas):
     pass
 
+def quizScreenThree_mousePressed(app,event):
+    if app.quiz3StartButton.inBounds(event.x, event.y):
+        app.quiz3StartButton.buttonPressed(switchMode(app,'gameScreen','pink','gameScreen'))
+        print('Game start button pressed!')
+    else:
+        app.dotCount += 1
+        print(app.dotCount)
+
+def quizScreenThree_timerFired(app):
+    pass
+
+# NOTE WILL REMOVE LATER
 def quizScreenThree_keyPressed(app,event):
     if event.key == 'Left':
         app.screenColour = '#d8d4f1'
@@ -517,21 +573,27 @@ def endGame_timerFired(app):
 
 def gameScreen_redrawAll(app,canvas):
     canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
+    dr.drawGround(canvas,0,740,app.width,app.height)
 
 def gameScreen_appStarted(app):
-    pass
-def gameScreen_timerFired(app):
-    pass
-def gameScreen_mousePressed(app,event):
     pass
 
 
 def gameScreen_keyPressed(app,event):
-    if event.key == 'Left':
+    if (event.key == "Left"):    app.player.movePlayer(-10, 0)
+    elif (event.key == "Right"): app.player.movePlayer(+5, 0)
+    elif (event.key == "Up"):    app.player.movePlayer(0, +10)
+    elif event.key == 'p':
+        app.screenColour = 'grey74'
+        app.mode = 'pauseScreen'
+        app._title = 'pauseScreen'
+
+
+    if event.key == 'r':
         app.screenColour = '#ff8c95'
         app.mode = 'quizScreenThree'
         app._title = 'quizScreen3'
-    elif event.key == 'Right':
+    elif event.key == 'n':
         # include different colours based on weither player won or not
         if app.gameOutcome == 'Win':
             app.screenColour = '#eac4bb'
@@ -541,15 +603,19 @@ def gameScreen_keyPressed(app,event):
             app.screenColour = 'lawn green'
         app.mode = 'endGame'
         app._title = 'endGame'
-    elif event.key == 'p':
-        app.screenColour = 'grey74'
-        app.mode = 'pauseScreen'
-        app._title = 'pauseScreen'
+    
+
 
 
 def spawnItem():
     pass
 def spawnWord():
+    pass
+
+
+def gameScreen_timerFired(app):
+    pass
+def gameScreen_mousePressed(app,event):
     pass
 
 runApp(width=1200, height=820, title = 'ZenMode')

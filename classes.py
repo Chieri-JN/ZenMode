@@ -11,17 +11,27 @@ import random
 import string
 import dictionaries as dict
 import texts_colours as col
+import drawings as dr
 
 #################################################
 # Helper functions
 #################################################
 
-
+def branchPoint(startx,starty,h,dir):
+    xl = math.cos(math.radians(60)) * h
+    yl = math.sin(math.radians(60)) * h
+    newy = starty + yl
+    if dir == 'right':
+        newx = startx + xl
+    elif dir == 'left':
+        newx = startx - xl
+    return (newx,newy)
 
 #################################################
 # Player Class
 #################################################
 # TODO INCORPERATE BOUNDS
+
 class Player():
     def __init__(self, px, py):
         self.px = px
@@ -29,7 +39,8 @@ class Player():
         self.score = 0
 
     def movePlayer(self,dx,dy):
-        pass
+        self.px += dx
+        self.py += dy
     
     def getPowerUp(self,ix,iy):
         pass
@@ -86,8 +97,9 @@ class Antonyme(Word):
     pass
 
 class WordBubble(Word):
-    def __init__(self,cx,cy,r,colour,width,outline):
+    def __init__(self,word,cx,cy,r,colour,width,outline):
         # super().__init__(cx)
+        self.word = word
         self.cx = cx
         self.cy = cy
         self.r = r
@@ -159,15 +171,42 @@ class Button:
 #################################################
 
 class Tree:
-    def __init__(self,depth):
+    def __init__(self,depth,startx,starty):
         self.branches = []
         self.depth = depth
+        self.startx = startx
+        self.starty = starty
     
-    def drawBranch(self,depth):
+    def drawBranch(self,canvas,depth,x0,y0,x1,y1,step=0):
         if depth == 0:
-            return 'create draw funciton'
+            dr.drawBranch(canvas,x0,y0,x1,y1)
         else:
-            self.drawBranch(depth-1)
+
+            # Main branch
+            self.drawBranch(depth+1)
+
+            # left branch
+            self.drawBranch(depth+1)
+
+            # Right branch
+            self.drawBranch(depth+1)
+
+
+def drawFreddyFractal(app, canvas, level, x, y, radius, step=0):
+    if level == 0:
+        # drawFreddyHead(app, canvas, x, y, radius, step)
+        drawBranch(app,canvas,x,y,radius)
+    else:
+        # main head
+        drawFreddyFractal(app, canvas, level-1, x, y, radius, step+1)
+
+        # left ear/head
+        drawFreddyFractal(app, canvas, level-1, x-(radius*1.1),
+                          y-radius, radius/2, step+2)
+
+        # right ear/head
+        drawFreddyFractal(app, canvas, level-1, x+(radius*1.1), 
+                          y-radius, radius/2, step+3)
 
 #################################################
 # Pieslice Class
@@ -226,7 +265,7 @@ class MoodWheel():
         return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r-16)
 
 #################################################
-# Circle Class
+# Shape Classes
 #################################################
 class Circle():
     def __init__(self,cx,cy,r, colour,width,outline):
@@ -254,6 +293,9 @@ class Circle():
         self.cx = x
         self.cy = y
 
+class Dot(Circle):
+    # use equality and isinstance
+    pass
 
 class Box():
     def __init__(self,x, y, h, w, colour, outlinewidth, outline):
@@ -275,6 +317,11 @@ class Box():
 
     def inBounds(self, x, y):
         return (self.x0 <= x <= self.x1) and (self.y0 <= y <= self.y1)
+
+
+
+
+
 
 """THE FOLLOWING CODE IS TEST CODE AND WILL BE REMOVED IN FINAL PRODUCT"""
 def message():

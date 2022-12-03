@@ -39,9 +39,10 @@ def appStarted(app):
     app.selectedWord = None
     app.treebranches = []
     app.buttons = []
+def timerFired(app):
+    scr.startScreen_timerFired(app)
 
  # NOTE FOR LATER
  # just use hard check of if word is positve or neg in meaning(i.e. word in neg/pos)
- # 
 
 # runApp(width=1200, height=900)

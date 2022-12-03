@@ -4,7 +4,7 @@
 # Your name: Chieri Nnadozi
 # Your andrew id: cnnadozi
 #################################################
-
+# imports
 from cmu_112_graphics import *
 import classes as cl
 import drawings as dr
@@ -15,6 +15,7 @@ import random
 import string
 import math
 import time
+
 ##########################################
 # Helper Functions
 ##########################################
@@ -58,19 +59,21 @@ def switchMode(app,mode,colour,title):
     app._title = title
     app.tick = 0
     
-
 def appStarted(app):
     app.mode = 'gameScreen'
     app._title = 'ZenMode'
     # NOTE ORIGINAL #c8eed5
     app.screenColour = "#c8eed5"
-    app.timerDelay = 200
+    # app.timerDelay = 1
+        # milliseconds
+    # app.mouseMovedDelay = 10
+    app.timerDelay = 100 
     app.tick = 0
-    app.mouseMovedDelay = -10
-    app.gameStarted = False # prevents going from help to pause without staring the game
+
+    # app.mouseMovedDelay = 0
+    app.gameStarted = False # stops player from going from help to pause without staring the game
     app.gameOver = False 
-    # SET to NONE
-    app.gameOutcome = 'Loss'
+    app.gameOutcome = 'None'
     
     app.centerx = app.width/2
     app.centery = app.height/2
@@ -149,21 +152,20 @@ def appStarted(app):
                              app.resumeGameButton])
 
     # game screen unique App values
-
-    app.player = cl.Player(app.centerx,700)
+    app.pColour = "red"
+    # app.player = cl.Player(app.centerx,700)
+    app.spriteCounter = 0 # if not equal to zero set to zero
 
 ##########################################
 # Start Screen
 ##########################################
-def startScreen_appStarted(app): 
-    pass
 
 def startScreen_redrawAll(app,canvas):
-    #canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
+    bgColourChange(app)
     canvas.create_rectangle(0,0,app.width,app.height,fill=bgColourChange(app))
     title1 = cl.Word('Zen')
-    title2 = cl.Word('Mode')
-    bgColourChange(app)
+    title2 = cl.Word('Mode')    
+
     for button in app.Startbuttons:
         button.draw(canvas)
 
@@ -204,13 +206,14 @@ def startScreen_mousePressed(app,event):
     # app.setSize(newWidth, newHeight) NOTE use to change canvas size
 
 def bgColourChange(app):
+    # NOTE Switch to Dictionary 
     return col.pastelColoursList[app.tick%len(col.pastelColoursList)]
 
 def startScreen_timerFired(app):
-    #moveBall(app)
+    #moveBall(app):
+    app.tick +=1 
+    # print(app.tick)
 
-    app.tick +=1
-    print(app.tick)
 
 # NOTE Use timerFired to have colour gradually change (cycle through colours
 # cycle through RGB colours)
@@ -602,16 +605,12 @@ def gameScreen_keyPressed(app,event):
         else:
             app.screenColour = 'lawn green'
         app.mode = 'endGame'
-        app._title = 'endGame'
-    
-
-
+        app._title = 'endGame' 
 
 def spawnItem():
     pass
 def spawnWord():
     pass
-
 
 def gameScreen_timerFired(app):
     pass

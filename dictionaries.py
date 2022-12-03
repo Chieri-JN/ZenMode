@@ -94,7 +94,11 @@ dictonaryMood = {
 
 dictionaryState = {
 
-    'awake': {'alive','attentive','aware','cognizant','vigilant'}
+    'Negative': {},
+
+    'Positive': {}
 
 }
+
+
 

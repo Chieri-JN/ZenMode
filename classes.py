@@ -25,7 +25,7 @@ def branchPoint(startx,starty,h,dir):
         newx = startx + xl
     elif dir == 'left':
         newx = startx - xl
-    return (newx,newy)
+    return newx,newy
 
 #################################################
 # Player Class
@@ -33,18 +33,40 @@ def branchPoint(startx,starty,h,dir):
 # TODO INCORPERATE BOUNDS
 
 class Player():
-    def __init__(self, px, py):
+    def __init__(self,app,px, py):
         self.px = px
         self.py = py
         self.score = 0
+        self.idleSprites = dr.PlayerSprites(app)[0]
+        self.jumpSprites = dr.PlayerSprites(app)[1]
+        self.mRSprites = dr.PlayerSprites(app)[2]
+        self.mLSprites = dr.PlayerSprites(app)[3]
+        # self.sprS = spriteState # dictates what the player is doing
+        # self.sprC = spriteCount
+
+    def drawPlayer(self,canvas,spriteState,spriteCount):
+        if spriteState == 'idle':
+            sprite = self.idleSprites[spriteCount%len(self.idleSprites)]
+            canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
+
+        elif spriteState == 'jump':
+            sprite = self.jumpSprites[spriteCount%len(self.jumpSprites)]
+            canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
+
+        elif spriteState == 'right':
+            sprite = self.mRSprites[spriteCount]
+            canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
+        elif spriteState == 'left':
+            sprite = self.mLSprites[spriteCount]
+            canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
+
 
     def movePlayer(self,dx,dy):
         self.px += dx
         self.py += dy
     
-    def getPowerUp(self,ix,iy):
+    def inPlayerBounds(self,x,y):
         pass
-
 
 #################################################
 # Word Class
@@ -143,10 +165,6 @@ class Button:
         self.text = text
         self.font = font
 
-    # 
-    # def buttonPressed(self):
-    #     print('Button was pressed')
-    #     return self.function
     # takes in function and returns function 
     def buttonPressed(self,function):
         print('Button was pressed')
@@ -154,7 +172,8 @@ class Button:
 
     # checks that specified object is in bounds
     def inBounds(self, x, y):
-        return (self.x0 <= x <= self.x1) and (self.y0 <= y <= self.y1)
+        return ((self.x0- self.width <= x <= self.x1) and 
+                (self.y0 - self.height <= y <= self.y1))
     
     # NOTE remove activefill
     def draw(self, canvas):
@@ -165,48 +184,6 @@ class Button:
         canvas.create_text(self.x0, self.y0,
                                 text=self.text, font=f'{self.font}',
                                 fill=self.outline)
-
-#################################################
-# Tree Class
-#################################################
-
-class Tree:
-    def __init__(self,depth,startx,starty):
-        self.branches = []
-        self.depth = depth
-        self.startx = startx
-        self.starty = starty
-    
-    def drawBranch(self,canvas,depth,x0,y0,x1,y1,step=0):
-        if depth == 0:
-            dr.drawBranch(canvas,x0,y0,x1,y1)
-        else:
-
-            # Main branch
-            self.drawBranch(depth+1)
-
-            # left branch
-            self.drawBranch(depth+1)
-
-            # Right branch
-            self.drawBranch(depth+1)
-
-
-def drawFreddyFractal(app, canvas, level, x, y, radius, step=0):
-    if level == 0:
-        # drawFreddyHead(app, canvas, x, y, radius, step)
-        drawBranch(app,canvas,x,y,radius)
-    else:
-        # main head
-        drawFreddyFractal(app, canvas, level-1, x, y, radius, step+1)
-
-        # left ear/head
-        drawFreddyFractal(app, canvas, level-1, x-(radius*1.1),
-                          y-radius, radius/2, step+2)
-
-        # right ear/head
-        drawFreddyFractal(app, canvas, level-1, x+(radius*1.1), 
-                          y-radius, radius/2, step+3)
 
 #################################################
 # Pieslice Class
@@ -318,68 +295,108 @@ class Box():
     def inBounds(self, x, y):
         return (self.x0 <= x <= self.x1) and (self.y0 <= y <= self.y1)
 
+#################################################
+# Tree Class
+#################################################
 
+class Tree:
+    def __init__(self,depth,startx,starty):
+        self.branches = []
+        self.depth = depth
+        self.startx = startx
+        self.starty = starty
+        self.anlgeShift = math.pi/5
+    
+    def drawBranch(self,canvas,depth,x0,y0,x1,y1,step=0,check=0):
+        if depth == step:
+            dr.drawBranch(canvas,x0,y0,x1,y1,step,check)
+        else:
+            
+            #main branch
+            self.drawBranch(canvas,depth,x0,y0,x1,y1,step+1,check+1)
 
+            #left branch
+            xl,yl = branchPoint(x1,y1,(y1-y0)*0.75,'left')
+            self.drawBranch(canvas,depth,x1,y1,xl,yl,step+1,check+2)
 
+            # Right branch
+            xr,yr = branchPoint(x1,y1,(y1-y0)*0.75,'right')
+            self.drawBranch(canvas,depth,x1,y1,xr,yr,step+1,check+2)
+
+    # def drawBranch(self,canvas,depth,ogX,ogY,):
+    #     pass
+ 
 
 
 """THE FOLLOWING CODE IS TEST CODE AND WILL BE REMOVED IN FINAL PRODUCT"""
-def message():
-    return 'Something happened!'
 
-def appStarted(app):   
-    app.buttons = []
-    app.words = []
-    for key in dict.dictonaryMood:
-        testword = Word(key)
-        app.words.append(testword)
-    app.check = False
+# for key in dict.dictonaryMood:
+#     testword = Word(key)
+#     print(testword)
+#     print(testword.getWord())
+#     print(testword.getWordDict())
+#     print(testword.getAntonymes())
+#     print('')
 
-    newButton = Button(100, 200, 70, 120, 'green', 'lightGreen', 3, 'white',
-                       "Button",'Krungthep 20')
-    app.buttons.append(newButton)
-    
-for key in dict.dictonaryMood:
-    testword = Word(key)
-    # print(testword)
-    # print(testword.getWord())
-    # # print(testword.getWordDict())
-    # print(testword.getAntonymes())
-    # print('')
-
-# testword2 = Word('Send Help')
-# print(testword2.getAntonymes())
 
 def mousePressed(app,event):
+    pass
 
-    for button in app.buttons:
-        if button.inBounds(event.x, event.y) or app.check:
-            print(button.buttonPressed(message()))
-    return 'Not a Button!'
+def appStarted(app):
+    app.player = Player(app,app.width/2,790)
+    # app.timerDelay = 1000
+    app.spriteCounter  = 0
+    # app.playerSprites = PlayerSprites(app)[3]
+    app.spriteState = 'idle'
+    app.jumpState = 0
+    app.timerDelay = 300
+
     
-# def redrawAll(app, canvas):
-#     mood1 = MoodWheel(app.width/2-300,550,190)
-#     mood1.drawColourWheel(canvas)
-#     testword.drawWord(canvas,100,50,'Krungthep 26','red')
+def redrawAll(app, canvas):
+    drawPlayer(app,canvas)
+#     tree = Tree(4,app.width/2,750)
+#     tree.drawBranch(canvas,5,app.width/2,790,app.width/2,700)
 
 #     for i in range(len(app.words)):
 #         # note this goes in revers
 #         app.words[i].drawWord(canvas,100,50 + 30*i,'Krungthep 26','red')
-#     for button in app.buttons:
-#         button.draw(canvas)
-#     pass
 
-def mouseMoved(app, event):
-    for button in app.buttons:
-        if button.inBounds(event.x, event.y):
-            app.check = True
-        else:
-            app.check = False
-            # button.buttonPressed(event, message())
+def drawPlayer(app,canvas):
+    app.player.drawPlayer(canvas,app.spriteState,app.spriteCounter)
+    
 
-    # for branch in app.branches:
-    #     branch.draw(canvas)
+def keyPressed(app,event):
+    if event.key == 'Right':
+        app.spriteCounter = 1
+        app.spriteState = 'right'
+        app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
 
+    if event.key == 'Left':
+        # app.spriteCounter = 1
+        app.spriteState = 'left'
+        app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
+        
+def keyReleased(app,event):
+    if event.key == 'Space':
+        app.spriteState = 'jump'
+    elif event.key == 'Right':
+        app.spriteState = 'idle'
+    elif event.key == 'Left':
+        app.spriteState = 'idle'
+    # elif not event.key:
+    #     timerFired(app)
 
-# runApp(width=800, height=800)
+def timerFired(app):
+            if app.spriteState == 'idle':
+                app.spriteCounter = (1 + app.spriteCounter) % 2
+
+            if app.spriteState == 'jump':
+                app.timerDelay = 1000
+                app.spriteCounter = 0
+                while app.spriteCounter < 12:
+                    app.spriteCounter +=1
+                app.spriteState = 'idle'
+                app.timerDelay = 200
+
+runApp(width=800, height=800)
     

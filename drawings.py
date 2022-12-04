@@ -14,17 +14,14 @@ import math
 ##########################################
 # Helper Functions
 ##########################################
-
-
 def HextoRGB(hexColour):
     r,g,b = 0,0,0
     
     return(r,g,b)
 
 ##########################################
-# Wave
+# Background Tree
 ##########################################
-
 def drawWave(canvas,cx,cy,r):
     canvas.create_arc(cx-r,cy-r,cx+r,cy+r, 
                             fill="black", outline = '', style="pieslice", 
@@ -34,29 +31,30 @@ def drawWave(canvas,cx,cy,r):
 # Ground
 ##########################################
 
-def drawGround(canvas,x0,y0,width,height):
-
+def drawGround(canvas,x0,y0,width,y1):
     dirtSpecs = 20
-
     #dirt
-    canvas.create_rectangle(x0,y0,x0+width,height,fill="#372826",width=0)
+    canvas.create_rectangle(x0,y0+20,width,y1,fill="#372826",width=0)
+    
     # grass
     grassBlades = width // 40
-    margin = width / 40 % 1
-    bladeW = 10
-    bladeH = 7
-    canvas.create_rectangle(x0,y0,x0+width,y0+20,fill="#39ac39",width=0)
+
+    canvas.create_rectangle(x0,y0+20,width,y0+50,fill='#267326' ,width=0)
+    canvas.create_rectangle(x0,y0-20,width,y0+20,fill="#39ac39",width=0)
     for grass in range(grassBlades):
-
-        pass
-        # canvas.create_polygon(x0*grass,y0+20, (x0)*(grass+1),y0+20, (x0+bladeW/2)*grass,
-        #                        y0+bladeH+20,fill="#39ac39",width=0)
-
-
+        if grass % 4 == 0:
+            #                   (x0,y0,x1,y1,x2,y2,x3,y3)
+            canvas.create_line((30+50*grass)+x0,y0+5 , (30+50*grass)+x0,y0-7 , (33+50*grass)+x0,y0-14, 
+                              (40+50*grass)+x0,y0-6,joinstyle='bevel',fill='#194d19',width=4,
+                               capstyle='round')
+        if grass % 4 == 2: 
+            canvas.create_line((40+50*grass)-x0,y0-6 , (33+50*grass)-x0,y0-14 , (30+50*grass)-x0,y0-7, 
+                              (30+50*grass)-x0,y0+5,joinstyle='bevel',fill='#2c872c',width=4,
+                               capstyle='round')
+    
 ##########################################
 # Branch
 ##########################################
-
 def drawBranch(canvas,x0,y0,x1,y1,step,check):
     # if step < 5:
     #     colour = "#674119"
@@ -83,22 +81,23 @@ def drawBranch(canvas,x0,y0,x1,y1,step,check):
 ##########################################
 # Sprite sheets retrieved from https://godotmarketplace.com/shop/2d-pixel-slime-set/
 def PlayerSprites(app):
-
-    app.image1 = app.loadImage('slimeIdle.png')
+    app.image1 = app.loadImage('slimeSprites/slimeIdle.png')
     slimeIdle = app.scaleImage(app.image1, 6)
 
-    app.image2 = app.loadImage('slimeJump.png')
-    slimeJump = app.scaleImage(app.image2, 6)
-    # slimeJump = app.image2
+    app.image2 = app.loadImage('slimeSprites/slimeRIdle.png')
+    slimeIdleR = app.scaleImage(app.image2, 6)
 
-    app.image3 = app.loadImage('slimeMoveRight.png')
-    slimeMRight = app.scaleImage(app.image3, 6)
-    # slimeMRight = app.image3
+    app.image3 = app.loadImage('slimeSprites/slimeJump.png')
+    slimeJump = app.scaleImage(app.image3, 6)
 
-    app.image4 = app.loadImage('slimeMoveLeft.png')
-    slimeMLeft = app.scaleImage(app.image4, 6)
+    app.image4 = app.loadImage('slimeSprites/slimeMoveRight.png')
+    slimeMRight = app.scaleImage(app.image4, 6)
+
+    app.image5 = app.loadImage('slimeSprites/slimeMoveLeft.png')
+    slimeMLeft = app.scaleImage(app.image5, 6)
 
     idle = []
+    idleR = []
     jump = []
     right = []
     left = []
@@ -108,6 +107,11 @@ def PlayerSprites(app):
         sprite = slimeIdle.crop((480*i, 96, 240+480*i, 264))
         idle.append(sprite)
 
+    for i in range(2):
+        # sprite = slimeIdle.crop((80*i, 0, 40+80*i, 44))
+        sprite = slimeIdleR.crop((10+480*i, 96, 320+480*i, 264))
+        idleR.append(sprite)
+
     for i in range(11):
         # use conditional to case on vertical crop
         # sprite = slimeJump.crop((78*i, 0, 78+78*i, 79))
@@ -116,32 +120,37 @@ def PlayerSprites(app):
 
     for i in range(7):
         # sprite = slimeMRight.crop((11+80*i, 0, 34+80*i, 54))
-        sprite = slimeMRight.crop((66+480*i, 96, 204+480*i, 240))
+        sprite = slimeMRight.crop((66+480*i, 126, 204+480*i, 331))
         right.append(sprite)
 
     for i in range(7):
-        sprite = slimeMLeft.crop((66+480*i, 0, 212+480*i, 324))
+        sprite = slimeMLeft.crop((66+480*i, 126, 212+480*i, 331))
         left.append(sprite)
 
-    return {0:idle,1:jump,2:right,3:left}
+    return {0:idle,1:idleR,2:jump,3:right,4:left}
 
 
 """TEST CODE"""
 
-def appStarted(app):
-    # app.timerDelay = 1000
-    app.spriteCounter  = 0
-    app.playerSprites = PlayerSprites(app)[0]
-    pass
+# def appStarted(app):
+#     # app.timerDelay = 1000
+#     app.spriteCounter  = 0
+#     app.playerSprites = PlayerSprites(app)[1]
+#     app.spriteCounter2  = 0
+#     app.playerSprites2 = PlayerSprites(app)[0]
+#     pass
 
 # def redrawAll(app,canvas):
 #     sprite = app.playerSprites[app.spriteCounter]
-#     canvas.create_image(app.width/2, app.height/2, image=ImageTk.PhotoImage(sprite))
+#     sprite2 = app.playerSprites2[app.spriteCounter2]
+#     canvas.create_image(app.width/2, app.height/2+200, image=ImageTk.PhotoImage(sprite))
+#     canvas.create_image(app.width/2, app.height/2, image=ImageTk.PhotoImage(sprite2))
 #     pass
 
 
 # def timerFired(app):
 #     app.spriteCounter = (1 + app.spriteCounter) % len(app.playerSprites)
+#     app.spriteCounter2 = (1 + app.spriteCounter2) % len(app.playerSprites2)
 #     # print(len(PlayerSprites(app)[1]))
 # #      drawBranch(canvas,app.width/2,780,app.width/2,700,5)
 #     pass

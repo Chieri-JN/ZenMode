@@ -41,8 +41,6 @@ def circlesIntersect(x1, y1, r1, x2, y2, r2):
 def perfElasticCollision():
     pass
 
-def areaCircle():
-    pass
 
 # NOTE MODIDY PARAMETERS IF NEEDED
 def drawRandomShapes(shape,rate,bounds):
@@ -118,7 +116,6 @@ def appStarted(app):
     app.quiz2Buttons.extend([app.chooseWordButton,app.refreshWordButton])
 
     # quiz3 Screen unique App values
-   
     app.dotColour = random.choice(col.coloursTwoList)
     app.dotCount = 0
     app.dots = []
@@ -153,8 +150,35 @@ def appStarted(app):
 
     # game screen unique App values
     app.pColour = "red"
-    # app.player = cl.Player(app.centerx,700)
-    app.spriteCounter = 0 # if not equal to zero set to zero
+    app.ground = 720 
+    app.px,app.py = app.centerx, app.ground
+    app.pxB = app.px
+    app.player = cl.Player(app,app.px,app.py)
+    app.spriteCounter = 0 
+    app.spriteState = 'idle'
+
+    app.jumpState = False
+    app.jumpCounter = 0
+   
+    app.gravity = -9.8 # in m/s :) 
+    app.pM = 10
+    app.wordM = 10
+
+    # world boundries
+    app.WorldWidthLeft =  -400
+    app.WorldWidthRight = app.width + 400
+        # moving L will icrease Rd and decrease Ld,
+        # if curr = WW(any) stop side scrolling and allow player to collide with edge of window
+        # player can get up to 50 from edge 
+    # app.currDistfromWWR = app.width
+    # app.currDistfromWWL = 0
+    app.PcurrDistfromWR = app.width
+    app.PcurrDistfromWL = 0
+    app.WorldMargine = 50
+    app.worldShift = 0
+    # NOTE change to a little over the width of world bubbles
+    # NOTE TEMPORY VARIABLE
+    # app.wordPosrandom.randrange(app.WorldWidthLeft+20,app.WorldWidthRight-20)
 
 ##########################################
 # Start Screen
@@ -203,8 +227,6 @@ def startScreen_mousePressed(app,event):
         app.helpButton.buttonPressed(switchMode(app,'helpScreen','#96c9a6','helpScreen'))
         print('Help button pressed!')
 
-    # app.setSize(newWidth, newHeight) NOTE use to change canvas size
-
 def bgColourChange(app):
     # NOTE Switch to Dictionary 
     return col.pastelColoursList[app.tick%len(col.pastelColoursList)]
@@ -212,16 +234,10 @@ def bgColourChange(app):
 def startScreen_timerFired(app):
     #moveBall(app):
     app.tick +=1 
-    # print(app.tick)
 
-
-# NOTE Use timerFired to have colour gradually change (cycle through colours
-# cycle through RGB colours)
-# Have circles, randomly generated and drifting across screen, slightly light/
-# darker than actually bg colour()
-# NOTE (maybe)if balls are pressed they will change shade
+# NOTE Have balls, randomly generated and drifting across screen, slightly light/
+# darker than actually bg colour() in sinusoidal pattern
 # OR have bg be paler shade(pastel) of circle colour  
-# scatter function/transition function for when I screen is changed
 
 ##########################################
 # Quiz Screens / Start Mode
@@ -264,12 +280,12 @@ def drawCircle(app, canvas):
     app.circle1.Drag(app.circlex,app.circley)
     app.circle1.draw(canvas)
 
-
-# NOTE gets stuck if collides with border, try and shift pos or prevent collision
+# NOTE CHANGE <= and >= to just < and >
+# NOTE gets stuck if collides with border, try and shift pos or prevent collision # if not equal to zero set to zero
 def quizScreenOne_mouseDragged(app,event):
     if app.mood1.inBounds(app.circlex,app.circley):
-        if app.circle1.inBounds(event.x,event.y):
-            app.circlex,app.circley = event.x, event.y
+        # if app.circle1.inBounds(event.x,event.y):
+        app.circlex,app.circley = event.x, event.y
 
 # NOTE USE DISCTANCE TO CALCULATE location from circumfrence of circle
 def quizScreenOne_mouseReleased(app,event):
@@ -277,9 +293,9 @@ def quizScreenOne_mouseReleased(app,event):
         if app.circle1.inBounds(event.x,event.y):
             app.cwCirclePos = (event.x,event.y)
         # USE COORDINATE TO ASSIGN MOOD/COLOUR
+        # use active modes 
         print(app.cwCirclePos)
         
-
 def quizScreenOne_mousePressed(app,event):
     if app.selectMoodButton.inBounds(event.x, event.y): 
         if app.cwCirclePos != (app.centerx-300,550):
@@ -347,7 +363,6 @@ def quizScreenTwo_mousePressed(app,event):
     if app.refreshWordButton.inBounds(event.x, event.y):
         app.refreshWordButton.buttonPressed(chooseWords())
         print('Refresh word button pressed!')
-
 
 #NOTE remove Later
 def quizScreenTwo_keyPressed(app,event):
@@ -573,31 +588,80 @@ def endGame_timerFired(app):
 ##########################################
 # Game Screen / Game Mode
 ##########################################
+def gameScreen_appStarted(app):
+    app.timerDelay = 500
 
 def gameScreen_redrawAll(app,canvas):
-    canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
-    dr.drawGround(canvas,0,740,app.width,app.height)
+    drawWorld(app,canvas)
+    drawPlayer(app,canvas)
 
-def gameScreen_appStarted(app):
+def drawPlayer(app,canvas):
+    app.player.drawPlayer(canvas,app.spriteState,app.spriteCounter)
+
+
+def drawWorld(app,canvas):
+    canvas.create_rectangle(app.WorldWidthLeft+app.worldShift ,0, app.WorldWidthRight+app.worldShift
+                            ,app.height, fill=app.screenColour)
+    dr.drawGround(canvas,app.WorldWidthLeft+app.worldShift,app.ground,
+                  app.WorldWidthRight+app.worldShift, app.height)
+
+def resetPcurr(app):
     pass
 
-
 def gameScreen_keyPressed(app,event):
-    if (event.key == "Left"):    app.player.movePlayer(-10, 0)
-    elif (event.key == "Right"): app.player.movePlayer(+5, 0)
-    elif (event.key == "Up"):    app.player.movePlayer(0, +10)
+    # LEFT Key commands
+    if (event.key == "Left"):    
+        if app.PcurrDistfromWL >= app.WorldWidthLeft:
+            app.spriteState = 'left'
+            app.spriteCounter = (1 + app.spriteCounter) % 7 
+            app.player.movePlayer(-10,0)
+            app.PcurrDistfromWR -= 10
+            app.PcurrDistfromWL -= 10
+        else:
+            if app.worldShift + app.WorldWidthLeft < 0:
+                app.worldShift +=10
+                app.spriteState = 'left'
+                app.spriteCounter = (1 + app.spriteCounter) % 7
+            else: # should allow player to collide with window edge
+                if app.px >= app.pxB-120:
+                    app.player.movePlayer(-10,0)
+                    app.px -= 10
+                    app.spriteState = 'left'
+                    app.spriteCounter = (1 + app.spriteCounter) % 7
+
+    # RIGHT Key commands      
+    elif (event.key == "Right"): 
+        if app.PcurrDistfromWR <= app.WorldWidthRight:
+            app.spriteState = 'right'
+            app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
+            app.player.movePlayer(10,0)
+            app.PcurrDistfromWR += 10
+            app.PcurrDistfromWL += 10
+        else:
+            if app.WorldWidthRight + app.worldShift > app.width:
+                app.worldShift -=10
+                app.spriteState = 'right'
+                app.spriteCounter = (1 + app.spriteCounter) % 7
+            else:
+                if app.px <= app.pxB+100:
+                    app.player.movePlayer(10,0)
+                    app.px += 10
+                    app.spriteState = 'right'
+                    app.spriteCounter = (1 + app.spriteCounter) % 7
+        
+
+    elif (event.key == "Up"):    
+        app.player.movePlayer(0, +10)
     elif event.key == 'p':
         app.screenColour = 'grey74'
         app.mode = 'pauseScreen'
         app._title = 'pauseScreen'
-
 
     if event.key == 'r':
         app.screenColour = '#ff8c95'
         app.mode = 'quizScreenThree'
         app._title = 'quizScreen3'
     elif event.key == 'n':
-        # include different colours based on weither player won or not
         if app.gameOutcome == 'Win':
             app.screenColour = '#eac4bb'
         elif app.gameOutcome == 'Loss':
@@ -607,13 +671,38 @@ def gameScreen_keyPressed(app,event):
         app.mode = 'endGame'
         app._title = 'endGame' 
 
+def gameScreen_keyReleased(app,event):
+    if event.key == 'Space':
+        app.jumpState = True
+        app.spriteState == 'jump'
+    elif event.key == 'Right':
+        app.spriteState = 'idle'
+    elif event.key == 'Left':
+        app.spriteState = 'idleL'
+
+def gameScreen_timerFired(app):
+    if not app.jumpState:
+        if app.spriteState == 'idle':
+            app.spriteCounter = (1 + app.spriteCounter) % 2
+        elif app.spriteState == 'idleL':
+                app.spriteCounter = (1 + app.spriteCounter) % 2
+    elif app.jumpState:
+        app.spriteCounter = (1 + app.spriteCounter) % 11
+        app.jumpCounter += 1
+        if app.jumpCounter == 10:
+            app.jumpState = False
+            app.jumpCounter = 0
+            app.spriteState == 'idle'
+    if app.gameOver == True:
+        app.mode = 'endGame'
+        app._title = 'endGame'
+
 def spawnItem():
     pass
 def spawnWord():
+    random.randomchoice
     pass
 
-def gameScreen_timerFired(app):
-    pass
 def gameScreen_mousePressed(app,event):
     pass
 

@@ -36,11 +36,18 @@ class Player():
     def __init__(self,app,px, py):
         self.px = px
         self.py = py
+        self.pHeight = 186
+        self.pWidth = 140
+        # change var name
+        # player radius dimensions
+        self.pHr = self.pHeight/2
+        self.pWr = self.pWidth/2
         self.score = 0
         self.idleSprites = dr.PlayerSprites(app)[0]
-        self.jumpSprites = dr.PlayerSprites(app)[1]
-        self.mRSprites = dr.PlayerSprites(app)[2]
-        self.mLSprites = dr.PlayerSprites(app)[3]
+        self.idleLSprites = dr.PlayerSprites(app)[1]
+        self.jumpSprites = dr.PlayerSprites(app)[2]
+        self.mRSprites = dr.PlayerSprites(app)[3]
+        self.mLSprites = dr.PlayerSprites(app)[4]
         # self.sprS = spriteState # dictates what the player is doing
         # self.sprC = spriteCount
 
@@ -48,7 +55,9 @@ class Player():
         if spriteState == 'idle':
             sprite = self.idleSprites[spriteCount%len(self.idleSprites)]
             canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
-
+        elif spriteState == 'idleL':
+            sprite = self.idleLSprites[spriteCount%len(self.idleLSprites)]
+            canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
         elif spriteState == 'jump':
             sprite = self.jumpSprites[spriteCount%len(self.jumpSprites)]
             canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
@@ -66,7 +75,8 @@ class Player():
         self.py += dy
     
     def inPlayerBounds(self,x,y):
-        pass
+        return ((self.px - self.pWr <= x <= self.px + self.pWr) and
+                (self.py - self.pHr <= x <= self.py + self.pHr))
 
 #################################################
 # Word Class
@@ -343,17 +353,20 @@ def mousePressed(app,event):
     pass
 
 def appStarted(app):
-    app.player = Player(app,app.width/2,790)
+    app.px = app.width/2
+    app.py = 790
+    app.player = Player(app,app.px,app.py)
     # app.timerDelay = 1000
     app.spriteCounter  = 0
     # app.playerSprites = PlayerSprites(app)[3]
     app.spriteState = 'idle'
-    app.jumpState = 0
     app.timerDelay = 300
 
+    app.jumpState = False
+    app.jumpCounter = 0
     
-def redrawAll(app, canvas):
-    drawPlayer(app,canvas)
+# def redrawAll(app, canvas):
+#     drawPlayer(app,canvas)
 #     tree = Tree(4,app.width/2,750)
 #     tree.drawBranch(canvas,5,app.width/2,790,app.width/2,700)
 
@@ -367,36 +380,52 @@ def drawPlayer(app,canvas):
 
 def keyPressed(app,event):
     if event.key == 'Right':
-        app.spriteCounter = 1
         app.spriteState = 'right'
         app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
-
-    if event.key == 'Left':
-        # app.spriteCounter = 1
+        app.player.movePlayer(10,0)
+        # app.px += 5 
+    elif event.key == 'Left':
         app.spriteState = 'left'
         app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
-        
+        app.player.movePlayer(-10,0)
+        # app.px -= 10
+    elif event.key == 'Space':
+        app.spriteState == 'jump'
+        app.jumpState = True
+    elif not event.key:
+        timerFired(app)
+
 def keyReleased(app,event):
     if event.key == 'Space':
-        app.spriteState = 'jump'
+        app.jumpState = True
+        app.spriteState == 'jump'
     elif event.key == 'Right':
+        # create r idle
         app.spriteState = 'idle'
     elif event.key == 'Left':
-        app.spriteState = 'idle'
-    # elif not event.key:
-    #     timerFired(app)
+        app.spriteState = 'idleL'
 
 def timerFired(app):
-            if app.spriteState == 'idle':
-                app.spriteCounter = (1 + app.spriteCounter) % 2
+            if not app.jumpState:
+                if app.spriteState == 'idle':
+                    app.spriteCounter = (1 + app.spriteCounter) % 2
+                elif app.spriteState == 'idleL':
+                     app.spriteCounter = (1 + app.spriteCounter) % 2
+            elif app.jumpState:
+                app.spriteCounter = (1 + app.spriteCounter) % 11
+                app.jumpCounter += 1
+                if app.jumpCounter == 10:
+                    app.jumpState = False
+                    app.jumpCounter = 0
+                    app.spriteState == 'idle'
 
-            if app.spriteState == 'jump':
-                app.timerDelay = 1000
-                app.spriteCounter = 0
-                while app.spriteCounter < 12:
-                    app.spriteCounter +=1
-                app.spriteState = 'idle'
-                app.timerDelay = 200
+            # if app.spriteState == 'jump':
+            #     app.timerDelay = 1000
+            #     app.spriteCounter = 0
+            #     while app.spriteCounter < 12:
+            #         app.spriteCounter +=1
+            #     app.spriteState = 'idle'
+            #     app.timerDelay = 200
 
-runApp(width=800, height=800)
+# runApp(width=800, height=800)
     

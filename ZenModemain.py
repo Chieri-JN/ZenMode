@@ -33,16 +33,10 @@ import screens as scr
 
 def appStarted(app):
     app.mode == 'startScreen'
-    # app.timerDelay = 100
-    app.dictionary = dict.dictonaryMood  
-    # keys will be words that lead to set of synonymes
-    app.selectedWord = None
-    app.treebranches = []
-    app.buttons = []
+    
 def timerFired(app):
-    scr.startScreen_timerFired(app)
+    pass
 
- # NOTE FOR LATER
- # just use hard check of if word is positve or neg in meaning(i.e. word in neg/pos)
+# app.setSize(newWidth, newHeight) NOTE use to change canvas size
 
-# runApp(width=1200, height=900)
+# runApp(width=1200, height=820, title = 'ZenMode')

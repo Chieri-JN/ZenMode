@@ -42,10 +42,6 @@ def perfElasticCollision():
     pass
 
 
-# NOTE MODIDY PARAMETERS IF NEEDED
-def drawRandomShapes(shape,rate,bounds):
-    pass
-
 ##########################################
 # Main App
 ##########################################
@@ -56,15 +52,15 @@ def switchMode(app,mode,colour,title):
     app.mode = mode
     app._title = title
     app.tick = 0
+    app.circlex = app.centerx-300
+    app.circley = 550
     
 def appStarted(app):
     app.mode = 'gameScreen'
     app._title = 'ZenMode'
     # NOTE ORIGINAL #c8eed5
+    # #c8e5ee game screen
     app.screenColour = "#c8eed5"
-    # app.timerDelay = 1
-        # milliseconds
-    # app.mouseMovedDelay = 10
     app.timerDelay = 100 
     app.tick = 0
 
@@ -75,9 +71,7 @@ def appStarted(app):
     
     app.centerx = app.width/2
     app.centery = app.height/2
-    app.selectedWord = 'None'
-    app.mass = 10
-
+    
     # startScreen unique App values
     app.Startbuttons = []
     # NOTE WIll not respond when mouse hovers over txt
@@ -102,11 +96,21 @@ def appStarted(app):
     app.quiz1Buttons.extend([app.selectMoodButton])
 
     # quiz2 Screen unique App values
-    app.WordList = []
-    # for word in dict.dictonaryMood:
-    #     wordbubble = cl.WordBubble(word,)
-    #     app.WordList.append(wordbubble)
-
+    app.mass = 10
+    
+    app.selectedWord = 'happy' # Default is None
+    app.wordBubbleList = []
+    # # cx,cy,r,colour,width,outline
+    app.wbr = 40
+    app.wbw = 7
+    app.wbo = 'grey45'
+    app.wbcolour = ''
+    app.wbx = 0
+    app.wby = 0
+    for word in dict.dictonaryMood:
+        wordbubble = cl.WordBubble(word)
+        app.wordBubbleList.append(wordbubble)
+    app.selectedWBList = [] # used to store the randomly selected words
     # buttons
     app.quiz2Buttons = []
     app.chooseWordButton = cl.Button(app.centerx+340, 500, 80, 150,'#a89fe0','#cbc5ec',5,
@@ -149,8 +153,16 @@ def appStarted(app):
                              app.resumeGameButton])
 
     # game screen unique App values
-    app.pColour = "red"
+    # world
     app.ground = 720 
+    app.WorldWidthLeft =  -400
+    app.WorldWidthRight = app.width + 400
+    app.PcurrDistfromWR = app.width
+    app.PcurrDistfromWL = 0
+    app.WorldMargine = 50
+    app.worldShift = 0
+    # Player
+    app.pColour = "red"
     app.px,app.py = app.centerx, app.ground
     app.pxB = app.px
     app.player = cl.Player(app,app.px,app.py)
@@ -160,25 +172,20 @@ def appStarted(app):
     app.jumpState = False
     app.jumpCounter = 0
    
+   # Tree
+    app.tree = cl.Tree(0,app.centerx,app.ground)
+    app.treeDepth = 1
+
     app.gravity = -9.8 # in m/s :) 
     app.pM = 10
     app.wordM = 10
 
     # world boundries
-    app.WorldWidthLeft =  -400
-    app.WorldWidthRight = app.width + 400
-        # moving L will icrease Rd and decrease Ld,
-        # if curr = WW(any) stop side scrolling and allow player to collide with edge of window
-        # player can get up to 50 from edge 
-    # app.currDistfromWWR = app.width
-    # app.currDistfromWWL = 0
-    app.PcurrDistfromWR = app.width
-    app.PcurrDistfromWL = 0
-    app.WorldMargine = 50
-    app.worldShift = 0
+    
+    # random.randrange(app.WorldWidthLeft+20,app.WorldWidthRight-20)
     # NOTE change to a little over the width of world bubbles
     # NOTE TEMPORY VARIABLE
-    # app.wordPosrandom.randrange(app.WorldWidthLeft+20,app.WorldWidthRight-20)
+    app.wordPos = random.randrange(app.WorldWidthLeft+20,app.WorldWidthRight-20)
 
 ##########################################
 # Start Screen
@@ -339,6 +346,8 @@ def quizScreenTwo_redrawAll(app,canvas):
     box = cl.Box(app.centerx-200, 500, 450, 650, '#8578d3', 10, '#6252c7')
     box.draw(canvas)
 
+    # redrawWords(app,canvas)
+    
     for button in app.quiz2Buttons:
         button.draw(canvas)
 
@@ -351,9 +360,29 @@ def quizScreenTwo_timerFired(app):
 
     pass
 
-def chooseWords():
-    # choose 6 words from list at random
-    pass
+def chooseWords(app):
+    return random.choices(app.wordBubbleList,k=6)
+
+# switch
+def redrawWords(app,canvas):
+    wordlist = chooseWords(app)
+    for wordBubble in wordlist:# app.wordBubbleList:
+        app.wbx = wordRandomVarsLocation(app)[0]
+        app.wby = wordRandomVarsLocation(app)[1]
+        app.wbcolour = wordRandomVarsLocation(app)[2]
+        if len(wordBubble.getWord()) > 8: 
+            wordBubble.draw(canvas,('Baloo Bhaijaan','12'),app.wbx, app.wby, 
+                                     app.wbr, app.wbcolour,app.wbw, app.wbo)
+        else:
+            wordBubble.draw(canvas,('Baloo Bhaijaan','15'),app.wbx, app.wby, 
+                            app.wbr, app.wbcolour,app.wbw, app.wbo)
+
+def wordRandomVarsLocation(app):
+
+    app.wbx = random.randrange(app.centerx-515 + app.wbr,app.centerx+115-app.wbr)
+    app.wby = random.randrange(285+app.wbr,720-app.wbr)
+    app.wbcolour = random.choice(col.pastelColoursTwoList)
+    return (app.wbx,app.wby,app.wbcolour)
 
 def quizScreenTwo_mousePressed(app,event):
     if app.chooseWordButton.inBounds(event.x, event.y):
@@ -408,7 +437,7 @@ def drawDots(app,canvas):
 
 def quizScreenThree_mousePressed(app,event):
     if app.quiz3StartButton.inBounds(event.x, event.y):
-        app.quiz3StartButton.buttonPressed(switchMode(app,'gameScreen','pink','gameScreen'))
+        app.quiz3StartButton.buttonPressed(switchMode(app,'gameScreen','#c8e5ee','gameScreen'))
         print('Game start button pressed!')
     else:
         app.dotCount += 1
@@ -424,7 +453,7 @@ def quizScreenThree_keyPressed(app,event):
         app.mode = 'quizScreenTwo'
         app._title = 'quizScreen2'
     elif event.key == 'Right':
-        app.screenColour = 'pink'
+        app.screenColour = '#c8e5ee'
         app.mode = 'gameScreen'
         app._title = 'gameScreen'
 
@@ -480,7 +509,7 @@ def pauseScreen_redrawAll(app,canvas):
 
 def pauseScreen_keyPressed(app,event):
     if event.key == 'Return':
-        app.screenColour = 'pink'
+        app.screenColour = '#c8e5ee'
         app.mode = 'gameScreen'
         app._title = 'gameScreen'  
     elif event.key == 'Escape':
@@ -504,7 +533,7 @@ def pauseScreen_mousePressed(app,event):
         print('Exit Game button pressed!')
         
     if app.resumeGameButton.inBounds(event.x, event.y):
-        app.startButton.buttonPressed(switchMode(app,'gameScreen','pink','gameScreen'))
+        app.startButton.buttonPressed(switchMode(app,'gameScreen','#c8e5ee','gameScreen'))
         print('Resume Game button pressed!')
 
 def pauseScreen_timerFired(app):
@@ -568,7 +597,7 @@ def endGame_redrawAll(app,canvas):
     
 def endGame_keyPressed(app,event):
     if event.key == 'Return':
-        app.screenColour = 'pink' 
+        app.screenColour = '#c8e5ee' 
         app.mode = 'gameScreen'
         app._title = 'gameScreen'
     elif event.key == 'Escape':
@@ -592,16 +621,24 @@ def gameScreen_appStarted(app):
     app.timerDelay = 500
 
 def gameScreen_redrawAll(app,canvas):
+    drawBackground(app,canvas)
+    drawTree(app,canvas,app.treeDepth)
     drawWorld(app,canvas)
     drawPlayer(app,canvas)
 
 def drawPlayer(app,canvas):
     app.player.drawPlayer(canvas,app.spriteState,app.spriteCounter)
 
+def drawTree(app,canvas,depth):
+    app.tree.drawBranch(canvas,depth,app.centerx,app.ground,app.centerx,app.ground-200)
+    pass
 
-def drawWorld(app,canvas):
+def drawBackground(app,canvas):
     canvas.create_rectangle(app.WorldWidthLeft+app.worldShift ,0, app.WorldWidthRight+app.worldShift
                             ,app.height, fill=app.screenColour)
+
+def drawWorld(app,canvas):
+    
     dr.drawGround(canvas,app.WorldWidthLeft+app.worldShift,app.ground,
                   app.WorldWidthRight+app.worldShift, app.height)
 
@@ -649,14 +686,15 @@ def gameScreen_keyPressed(app,event):
                     app.spriteState = 'right'
                     app.spriteCounter = (1 + app.spriteCounter) % 7
         
-
-    elif (event.key == "Up"):    
-        app.player.movePlayer(0, +10)
+    elif (event.key == "Space"):    
+        app.spriteState = 'jump'
+        app.spriteCounter = 1 # change later
     elif event.key == 'p':
         app.screenColour = 'grey74'
         app.mode = 'pauseScreen'
         app._title = 'pauseScreen'
 
+    # THIS CODE IS FOR TESTING PURPOSES ONLY
     if event.key == 'r':
         app.screenColour = '#ff8c95'
         app.mode = 'quizScreenThree'
@@ -670,32 +708,57 @@ def gameScreen_keyPressed(app,event):
             app.screenColour = 'lawn green'
         app.mode = 'endGame'
         app._title = 'endGame' 
+    elif event.key == 'Up':
+        # NOTE MAX DEPTH IS 8
+        app.treeDepth +=1
+    elif event.key == 'Down':
+        app.treeDepth -=1
+    elif not event.key:
+        gameScreen_timerFired(app) # app.?
+    
 
 def gameScreen_keyReleased(app,event):
     if event.key == 'Space':
         app.jumpState = True
+        gameScreen_timerFired(app) # app.?
+        # app.player.movePlayer(0,-40)
+        # app.py -=40
         app.spriteState == 'jump'
     elif event.key == 'Right':
         app.spriteState = 'idle'
     elif event.key == 'Left':
         app.spriteState = 'idleL'
+    elif not event.key:
+        gameScreen_timerFired() # app.?
 
+# FIX IDLE, something to do with jump
 def gameScreen_timerFired(app):
-    if not app.jumpState:
-        if app.spriteState == 'idle':
+    if app.spriteState == 'idle':
             app.spriteCounter = (1 + app.spriteCounter) % 2
-        elif app.spriteState == 'idleL':
-                app.spriteCounter = (1 + app.spriteCounter) % 2
-    elif app.jumpState:
+    elif app.spriteState == 'idleL':
+            app.spriteCounter = (1 + app.spriteCounter) % 2
+    # if app.jumpState=='False':
+    #     if app.spriteState == 'idle':
+    #         app.spriteCounter = (1 + app.spriteCounter) % 2
+    #     elif app.spriteState == 'idleL':
+    #             app.spriteCounter = (1 + app.spriteCounter) % 2
+    if app.jumpState:
         app.spriteCounter = (1 + app.spriteCounter) % 11
         app.jumpCounter += 1
         if app.jumpCounter == 10:
-            app.jumpState = False
             app.jumpCounter = 0
+            app.jumpState = False
             app.spriteState == 'idle'
+            app.spriteCounter = (1 + app.spriteCounter) % 2
+
+
+
     if app.gameOver == True:
         app.mode = 'endGame'
         app._title = 'endGame'
+    # if app.py < app.ground:
+    #     app.py += 1*app.gravity
+    #     app.player.movePlayer(0,1*app.gravity)
 
 def spawnItem():
     pass

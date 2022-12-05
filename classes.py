@@ -27,6 +27,11 @@ def branchPoint(startx,starty,h,dir):
         newx = startx - xl
     return newx,newy
 
+def distance(x1, y1, x2, y2): 
+    x = (x2 - x1)**2
+    y = (y2 - y1)**2
+    return math.sqrt(x + y) 
+    
 #################################################
 # Player Class
 #################################################
@@ -60,7 +65,7 @@ class Player():
             canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
         elif spriteState == 'jump':
             sprite = self.jumpSprites[spriteCount%len(self.jumpSprites)]
-            canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
+            canvas.create_image(self.px, self.py-125, image=ImageTk.PhotoImage(sprite))
 
         elif spriteState == 'right':
             sprite = self.mRSprites[spriteCount]
@@ -74,6 +79,7 @@ class Player():
         self.px += dx
         self.py += dy
     
+    # NOTE FIX
     def inPlayerBounds(self,x,y):
         return ((self.px - self.pWr <= x <= self.px + self.pWr) and
                 (self.py - self.pHr <= x <= self.py + self.pHr))
@@ -129,25 +135,33 @@ class Antonyme(Word):
     pass
 
 class WordBubble(Word):
-    def __init__(self,word,cx,cy,r,colour,width,outline):
+    def __init__(self,word):
+        # cx,cy,r,colour,width,outline
         # super().__init__(cx)
         self.word = word
+        self.cx = 0
+        self.cy = 0
+        self.r = 0
+        self.colour = 'white'
+        self.width = 0
+        self.outline = 'black'
+
+    def inBounds(self,x,y):
+        #NOTE Taken from dot class example
+        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r)
+
+    def draw(self,canvas,font,cx,cy,r,colour,width,outline):
         self.cx = cx
         self.cy = cy
         self.r = r
         self.colour = colour
         self.width = width
         self.outline = outline
-
-    def inBounds(self,x,y):
-        #NOTE Taken from dot class example
-        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r-16)
-
-    def draw(self,canvas,font):
         canvas.create_oval(self.cx-self.r,self.cy-self.r,
                            self.cx+self.r,self.cy+self.r,
                            fill=self.colour,width=self.width, outline=self.outline,
-                           text=f'{self.word}', font=font)
+                          )
+        canvas.create_text(self.cx,self.cy,text=f'{self.word}', font=font, fill=self.outline)
 
     def wordBubblePressed(self):
         return self.word
@@ -199,6 +213,7 @@ class Button:
 # Pieslice Class
 #################################################
 
+# possibly change to line class and use trig (sin,cos and iterated degrees/radians )
 class PieSlice():
     def __init__(self,cx,cy,r,colour,start):
         self.cx = cx
@@ -321,7 +336,6 @@ class Tree:
         if depth == step:
             dr.drawBranch(canvas,x0,y0,x1,y1,step,check)
         else:
-            
             #main branch
             self.drawBranch(canvas,depth,x0,y0,x1,y1,step+1,check+1)
 

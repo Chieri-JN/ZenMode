@@ -10,7 +10,6 @@ import random
 import string
 import math
 
-
 ##########################################
 # Helper Functions
 ##########################################
@@ -19,13 +18,20 @@ def HextoRGB(hexColour):
     
     return(r,g,b)
 
+# NOTE MODIDY PARAMETERS IF NEEDED
+def drawRandomShapes(shape,rate,bounds):
+    pass
+
 ##########################################
-# Background Tree
+# Background Trees
 ##########################################
-def drawWave(canvas,cx,cy,r):
-    canvas.create_arc(cx-r,cy-r,cx+r,cy+r, 
-                            fill="black", outline = '', style="pieslice", 
-                            extent=180)
+def drawTree(app,canvas,width,y1):
+    
+    pass
+
+def drawBackgroundTrees(app,canvas,width,y1):
+    
+    pass
 
 ##########################################
 # Ground
@@ -35,6 +41,7 @@ def drawGround(canvas,x0,y0,width,y1):
     dirtSpecs = 20
     #dirt
     canvas.create_rectangle(x0,y0+20,width,y1,fill="#372826",width=0)
+    #
     
     # grass
     grassBlades = width // 40
@@ -72,7 +79,7 @@ def drawBranch(canvas,x0,y0,x1,y1,step,check):
     else:
         colour = "#674119"
 
-    canvas.create_line(x0,y0,x1,y1, fill=colour,width=(28/check))
+    canvas.create_line(x0,y0,x1,y1, fill=colour,width=((check)))
     # capstyle='round'
 
 
@@ -115,7 +122,7 @@ def PlayerSprites(app):
     for i in range(11):
         # use conditional to case on vertical crop
         # sprite = slimeJump.crop((78*i, 0, 78+78*i, 79))
-        sprite = slimeJump.crop((40+480*i, 0, 180+480*i, 474))
+        sprite = slimeJump.crop((40+480*i, 90, 180+480*i, 360))
         jump.append(sprite)
 
     for i in range(7):
@@ -130,14 +137,15 @@ def PlayerSprites(app):
     return {0:idle,1:idleR,2:jump,3:right,4:left}
 
 
+
 """TEST CODE"""
 
 # def appStarted(app):
 #     # app.timerDelay = 1000
 #     app.spriteCounter  = 0
-#     app.playerSprites = PlayerSprites(app)[1]
+#     app.playerSprites = PlayerSprites(app)[3]
 #     app.spriteCounter2  = 0
-#     app.playerSprites2 = PlayerSprites(app)[0]
+#     app.playerSprites2 = PlayerSprites(app)[2]
 #     pass
 
 # def redrawAll(app,canvas):

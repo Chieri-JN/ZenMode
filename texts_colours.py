@@ -400,8 +400,6 @@ coloursList = []
 for colour in colours.splitlines():
     coloursList.append(colour)
 
-# print(len(coloursList))
-
 
 pastelColours ="""#A8B8FE
 #A8B9FE

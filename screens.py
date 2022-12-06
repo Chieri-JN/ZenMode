@@ -38,9 +38,9 @@ def circlesIntersect(x1, y1, r1, x2, y2, r2):
     return not (r1 + r2) < distance(x1, y1, x2, y2)
 
 # Perfect elsastic collision of two balls 
-def perfElasticCollision():
+def perfElasticCollision(x1,y1,x2,y2):
+    
     pass
-
 
 ##########################################
 # Main App
@@ -56,7 +56,7 @@ def switchMode(app,mode,colour,title):
     app.circley = 550
     
 def appStarted(app):
-    app.mode = 'gameScreen'
+    app.mode = 'quizScreenThree'
     app._title = 'ZenMode'
     # NOTE ORIGINAL #c8eed5
     # #c8e5ee game screen
@@ -64,7 +64,7 @@ def appStarted(app):
     app.timerDelay = 100 
     app.tick = 0
 
-    # app.mouseMovedDelay = 0
+    app.mouseMovedDelay = 0
     app.gameStarted = False # stops player from going from help to pause without staring the game
     app.gameOver = False 
     app.gameOutcome = 'None'
@@ -72,7 +72,7 @@ def appStarted(app):
     app.centerx = app.width/2
     app.centery = app.height/2
     
-    # startScreen unique App values
+    # startScreen unique App values 
     app.Startbuttons = []
     # NOTE WIll not respond when mouse hovers over txt
     app.startButton = cl.Button(app.centerx, 500, 85, 220,'#85daa2','#a9e5bd',5,
@@ -83,11 +83,14 @@ def appStarted(app):
 
     # quiz1 Screen unique App values
     app.mood1 = cl.MoodWheel(app.centerx-300,550,190)
+    app.currMood = 'white'
     app.circlex = app.centerx-300
     app.circley = 550
     app.circle1 = cl.Circle(app.circlex,app.circley, 20,'white',0,'')
-    app.currMood = 'Neutral'
-    app.mood = cl.Word(app.currMood)
+    # cx,cy,r, colour,width,outline
+    app.circle2 = cl.Circle(app.centerx+200,510,50,app.currMood,6,'grey44')
+    app.followMouse = False
+    # switch to colour
     app.cwCirclePos = (app.circlex,app.circley)
     app.quiz1Buttons = []
     # buttons
@@ -95,22 +98,32 @@ def appStarted(app):
                             'white','Select','Krungthep 30')
     app.quiz1Buttons.extend([app.selectMoodButton])
 
-    # quiz2 Screen unique App values
-    app.mass = 10
-    
-    app.selectedWord = 'happy' # Default is None
-    app.wordBubbleList = []
+    # quiz2 Screen unique App values    
+    app.selectedWord = 'None' # Default is None
+    app.selectedColour = 'white'
+
     # # cx,cy,r,colour,width,outline
+    app.wbx = app.centerx - 469
+    app.wby = 335
     app.wbr = 40
     app.wbw = 7
-    app.wbo = 'grey45'
-    app.wbcolour = ''
-    app.wbx = 0
-    app.wby = 0
+    app.wbo = 'grey25'
+    app.wbcolour = random.choices(col.pastelColoursTwoList,k=6)
+
+    app.dx = 2.4
+    app.dy = 3.3
+
+    app.wordBubbleList = []
     for word in dict.dictonaryMood:
         wordbubble = cl.WordBubble(word)
         app.wordBubbleList.append(wordbubble)
-    app.selectedWBList = [] # used to store the randomly selected words
+    # used to store the randomly selected words
+    app.selectedWBList = random.choices(app.wordBubbleList,k=6)
+
+    for wb in app.selectedWBList:
+        wb.cx = app.wbx
+        wb.cy = app.wby
+
     # buttons
     app.quiz2Buttons = []
     app.chooseWordButton = cl.Button(app.centerx+340, 500, 80, 150,'#a89fe0','#cbc5ec',5,
@@ -173,8 +186,9 @@ def appStarted(app):
     app.jumpCounter = 0
    
    # Tree
-    app.tree = cl.Tree(0,app.centerx,app.ground)
-    app.treeDepth = 1
+   #tree = Tree('green')
+    app.tree = cl.Tree(app.currMood)
+    app.treeDepth = 0
 
     app.gravity = -9.8 # in m/s :) 
     app.pM = 10
@@ -260,48 +274,56 @@ def quizScreenOne_redrawAll(app,canvas):
     drawCircle(app,canvas)
 
     header1 = cl.Word('Hello,')
-    header2 = cl.Word('How are you feeling today?')
+    header2 = cl.Word('What colour are you feeling today?')
     header3 = cl.Word('Current Mood:')
-
 
     for button in app.quiz1Buttons:
         button.draw(canvas)
 
     header1.drawWord(canvas,app.centerx-370,100,'K2D 120','grey54') #shadow
     header1.drawWord(canvas,app.centerx-375,100,'K2D 120','white')
-    header2.drawWord(canvas,app.centerx-20,200,'K2D 80','grey54') #shadow
-    header2.drawWord(canvas,app.centerx-25,200,'K2D 80','white')
+    header2.drawWord(canvas,app.centerx-12,200,'K2D 65','grey54') #shadow
+    header2.drawWord(canvas,app.centerx-17,200,'K2D 65','white')
 
     header3.drawWord(canvas,app.centerx+205,370,'K2D 70','grey54')
     header3.drawWord(canvas,app.centerx+200,370,'K2D 70','white')
 
     # will change when ball is moved
-    app.mood.drawWord(canvas,app.centerx+205,510,'K2D 70','gray65')
-    app.mood.drawWord(canvas,app.centerx+200,510,'K2D 70','gray99')
-    canvas.create_line(app.centerx+85,560,app.centerx+330,
-                       560,fill='gray65',width=8, smooth=True)
-    canvas.create_line(app.centerx+80,555,app.centerx+325,
-                       555,fill='grey99',width=8, smooth=True)
+    drawMood(app,canvas)
+    # canvas.create_line(app.centerx+85,560, app.centerx+330,560, app.centerx+330,
+    #                    500, app.centerx+85,500, app.centerx+85,560, 
+    #                    fill='gray65',width=8)
+
 
 def drawCircle(app, canvas):
     app.circle1.Drag(app.circlex,app.circley)
     app.circle1.draw(canvas)
 
+def drawMood(app,canvas):
+    app.circle2.draw(canvas)
+    pass
+    
 # NOTE CHANGE <= and >= to just < and >
 # NOTE gets stuck if collides with border, try and shift pos or prevent collision # if not equal to zero set to zero
 def quizScreenOne_mouseDragged(app,event):
     if app.mood1.inBounds(app.circlex,app.circley):
-        # if app.circle1.inBounds(event.x,event.y):
-        app.circlex,app.circley = event.x, event.y
+    #     if app.circle1.inBounds(event.x,event.y):
+        if app.followMouse == True:
+            app.circlex,app.circley = event.x, event.y
 
 # NOTE USE DISCTANCE TO CALCULATE location from circumfrence of circle
 def quizScreenOne_mouseReleased(app,event):
     if app.mood1.inBounds(event.x,event.y):
-        if app.circle1.inBounds(event.x,event.y):
-            app.cwCirclePos = (event.x,event.y)
-        # USE COORDINATE TO ASSIGN MOOD/COLOUR
-        # use active modes 
-        print(app.cwCirclePos)
+        # if app.circle1.inBounds(event.x,event.y):
+        app.followMouse = False
+        app.cwCirclePos = (app.circlex,app.circley)
+        app.currMood = app.mood1.getColour(app.circlex,app.circley)
+        app.circle2.colour = app.mood1.getColour(app.circlex,app.circley)
+        # print(len(app.mood1.listOfSlices))
+        # for slice in app.mood1.listOfSlices:
+        #     if slice.inBounds(app.circlex,app.circley):
+        #         app.currMood = slice.getColour()
+        #         app.currMood = 'green'
         
 def quizScreenOne_mousePressed(app,event):
     if app.selectMoodButton.inBounds(event.x, event.y): 
@@ -310,6 +332,8 @@ def quizScreenOne_mousePressed(app,event):
             print('Select Mood button pressed!')
         else:
             print('Please choose your mood')
+    if app.circle1.inBounds(event.x,event.y):
+        app.followMouse = True
 
 # NOTE will change mood
 def moodChange(app):
@@ -346,52 +370,68 @@ def quizScreenTwo_redrawAll(app,canvas):
     box = cl.Box(app.centerx-200, 500, 450, 650, '#8578d3', 10, '#6252c7')
     box.draw(canvas)
 
-    # redrawWords(app,canvas)
+    redrawWords(app,canvas)
     
     for button in app.quiz2Buttons:
         button.draw(canvas)
 
 def drawH3(app,canvas):
-    header3 = cl.Word(f'Chosen Word:\n {app.selectedWord}')
-    header3.drawWord(canvas,app.centerx+340,320,'K2D 50','grey44') #shadow
-    header3.drawWord(canvas,app.centerx+336,320,'K2D 50','white')
-
-def quizScreenTwo_timerFired(app):
-
-    pass
-
-def chooseWords(app):
-    return random.choices(app.wordBubbleList,k=6)
-
+    header3 = cl.Word(f'Chosen Word:')
+    header4 = cl.Word(app.selectedWord)
+    header3.drawWord(canvas,app.centerx+340,300,'K2D 50','grey44') #shadow
+    header3.drawWord(canvas,app.centerx+336,300,'K2D 50','white')
+    header4.drawWord(canvas,app.centerx+340,360,'K2D 50','grey44') #shadow
+    header4.drawWord(canvas,app.centerx+336,360,'K2D 50',app.selectedColour)
+    
 # switch
 def redrawWords(app,canvas):
-    wordlist = chooseWords(app)
-    for wordBubble in wordlist:# app.wordBubbleList:
-        app.wbx = wordRandomVarsLocation(app)[0]
-        app.wby = wordRandomVarsLocation(app)[1]
-        app.wbcolour = wordRandomVarsLocation(app)[2]
-        if len(wordBubble.getWord()) > 8: 
-            wordBubble.draw(canvas,('Baloo Bhaijaan','12'),app.wbx, app.wby, 
-                                     app.wbr, app.wbcolour,app.wbw, app.wbo)
+    for i in range(len(app.selectedWBList)):# app.wordBubbleList: 
+        wb = app.selectedWBList[i]
+        if len(app.selectedWBList[i].getWord()) > 8: 
+            app.selectedWBList[i].draw(canvas,('Baloo Bhaijaan','12'),app.wbx + 108*i, app.wby + 65*i, 
+                                     app.wbr, app.wbcolour[i],app.wbw, app.wbo)
         else:
-            wordBubble.draw(canvas,('Baloo Bhaijaan','15'),app.wbx, app.wby, 
-                            app.wbr, app.wbcolour,app.wbw, app.wbo)
+            app.selectedWBList[i].draw(canvas,('Baloo Bhaijaan','15'),app.wbx+ 108*i, app.wby + 65*i, 
+                            app.wbr, app.wbcolour[i],app.wbw, app.wbo)
 
-def wordRandomVarsLocation(app):
+def refreshWords(app):
+    app.selectedWBList = set(random.choices(app.wordBubbleList,k=6))
+    app.selectedWBList = list(app.selectedWBList)
+    app.wbcolour = random.choices(col.pastelColoursTwoList,k=6)
 
-    app.wbx = random.randrange(app.centerx-515 + app.wbr,app.centerx+115-app.wbr)
-    app.wby = random.randrange(285+app.wbr,720-app.wbr)
-    app.wbcolour = random.choice(col.pastelColoursTwoList)
-    return (app.wbx,app.wby,app.wbcolour)
+def quizScreenTwo_timerFired(app):
+    # for wb in app.selectedWBList:
+    #     #wb.setSpeed(app.dx,app.dy)
+    #     wb.Move(app.dx,app.dy)
+    #     if wb.cx - wb.r < app.centerx-525 or wb.cx + wb.r > app.centerx + 125:
+    #         # wb.setSpeed(-wb.speedx,)
+    #         wb.speedx = -wb.speedx
+    #     if wb.cy - wb.r < 275 or wb.cy + wb.r > 725:
+    #         wb.speedy = -wb.speedy
+
+    # for wb in app.selectedWBList:
+    #     for wb2 in app.selectedWBList:
+    #         # check check check wb2.cx+wb.r
+    #         if wb != wb and wb.inBounds(wb2.cx,wb2.cy):
+    #             wb.collision(wb2)
+    pass
 
 def quizScreenTwo_mousePressed(app,event):
     if app.chooseWordButton.inBounds(event.x, event.y):
-        app.chooseWordButton.buttonPressed(switchMode(app,'quizScreenThree','#ff8c95','quizScreen3'))
-        print('Choose word button pressed!')
+        if app.selectedWord != 'None':
+            app.chooseWordButton.buttonPressed(switchMode(app,'quizScreenThree','#ff8c95','quizScreen3'))
+            print('Choose word button pressed!')
+        else:
+            print('Please select a word')
 
     if app.refreshWordButton.inBounds(event.x, event.y):
-        app.refreshWordButton.buttonPressed(chooseWords())
+        app.refreshWordButton.buttonPressed(refreshWords(app))
         print('Refresh word button pressed!')
+
+    for wb in app.selectedWBList:
+        if wb.inBounds(event.x,event.y):
+            app.selectedWord = wb.getWord()
+            app.selectedColour = wb.getColour()
 
 #NOTE remove Later
 def quizScreenTwo_keyPressed(app,event):
@@ -618,7 +658,8 @@ def endGame_timerFired(app):
 # Game Screen / Game Mode
 ##########################################
 def gameScreen_appStarted(app):
-    app.timerDelay = 500
+    app.timerDelay = 100
+    pass
 
 def gameScreen_redrawAll(app,canvas):
     drawBackground(app,canvas)
@@ -630,8 +671,8 @@ def drawPlayer(app,canvas):
     app.player.drawPlayer(canvas,app.spriteState,app.spriteCounter)
 
 def drawTree(app,canvas,depth):
-    app.tree.drawBranch(canvas,depth,app.centerx,app.ground,app.centerx,app.ground-200)
-    pass
+    # note there is a max recursion error at depth 7
+    app.tree.drawBranch(canvas,app.treeDepth,app.centerx,app.ground,200,90)
 
 def drawBackground(app,canvas):
     canvas.create_rectangle(app.WorldWidthLeft+app.worldShift ,0, app.WorldWidthRight+app.worldShift
@@ -710,9 +751,11 @@ def gameScreen_keyPressed(app,event):
         app._title = 'endGame' 
     elif event.key == 'Up':
         # NOTE MAX DEPTH IS 8
-        app.treeDepth +=1
+        if app.treeDepth <= 7:
+            app.treeDepth +=1
     elif event.key == 'Down':
-        app.treeDepth -=1
+        if app.treeDepth > 0:
+            app.treeDepth -=1
     elif not event.key:
         gameScreen_timerFired(app) # app.?
     

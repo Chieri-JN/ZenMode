@@ -16,22 +16,44 @@ import drawings as dr
 #################################################
 # Helper functions
 #################################################
-
-def branchPoint(startx,starty,h,dir):
-    xl = math.cos(math.radians(60)) * h
-    yl = math.sin(math.radians(60)) * h
-    newy = starty + yl
-    if dir == 'right':
-        newx = startx + xl
-    elif dir == 'left':
-        newx = startx - xl
-    return newx,newy
-
 def distance(x1, y1, x2, y2): 
     x = (x2 - x1)**2
     y = (y2 - y1)**2
     return math.sqrt(x + y) 
-    
+
+def cosineLaw(x1,y1,x2,y2,x3,y3):
+    a = distance(x1,y1, x2,y2)
+    b = distance(x3,y3, x1,y1)
+    c = distance(x2,y2, x3,y3)
+    flip = 0
+    # think of this out of 360 instead
+    if y3>y2: 
+        flip += 90
+    else: 
+        flip += 0
+    if x3 < x1:
+        flip += 90
+    else:
+        flip +=0
+    step1 = (a**2 + b**2 - c**2)/ (2*a*b)
+    gamma =  math.acos(step1)
+    return math.degrees(gamma) + flip
+
+def branchPoint(startx,starty,h,angle):
+    xl = math.cos(math.radians(angle)) * h
+    yl = math.sin(math.radians(angle)) * h
+    newy = starty - yl
+    newx = startx + xl
+    return newx,newy
+
+# taken from 15-112 homework 
+import decimal
+def roundHalfUp(d):
+    # Round to nearest with ties going away from zero.
+    rounding = decimal.ROUND_HALF_UP
+    # See other rounding options here:
+    # https://docs.python.org/3/library/decimal.html#rounding-modes
+    return int(decimal.Decimal(d).to_integral_value(rounding=rounding))
 #################################################
 # Player Class
 #################################################
@@ -145,10 +167,8 @@ class WordBubble(Word):
         self.colour = 'white'
         self.width = 0
         self.outline = 'black'
-
-    def inBounds(self,x,y):
-        #NOTE Taken from dot class example
-        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r)
+        self.speedx = 0
+        self.speedy = 0
 
     def draw(self,canvas,font,cx,cy,r,colour,width,outline):
         self.cx = cx
@@ -163,12 +183,30 @@ class WordBubble(Word):
                           )
         canvas.create_text(self.cx,self.cy,text=f'{self.word}', font=font, fill=self.outline)
 
+    def __eq__(self, other):
+        return (isinstance(other, WordBubble) and (self.word == other.word))
+
     def wordBubblePressed(self):
         return self.word
+    
+    def getColour(self):
+        return self.colour
 
     def Move(self,dx,dy):
-        self.cx += dx
+        self.cx += dx 
         self.cy += dy
+
+    def setSpeed(self,vx,vy):
+        self.speedx = vx
+        self.speedy = vy
+    
+    def collision(self,other):
+        self.speedx,other.speedx = other.speedx, self.speedx
+        self.speedy,other.speedy = other.speedy, self.speedy
+
+    def inBounds(self,x,y):
+        #NOTE Taken from dot class example
+        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r)
 
 #################################################
 # Button Class
@@ -210,31 +248,6 @@ class Button:
                                 fill=self.outline)
 
 #################################################
-# Pieslice Class
-#################################################
-
-# possibly change to line class and use trig (sin,cos and iterated degrees/radians )
-class PieSlice():
-    def __init__(self,cx,cy,r,colour,start):
-        self.cx = cx
-        self.cy = cy
-        self.r = r 
-        self.colour = colour
-        self.start = start # = i
-
-    def draw(self,canvas):
-         canvas.create_arc(self.cx-self.r,self.cy-self.r, self.cx+self.r,
-                                  self.cy+self.r, fill=self.colour, 
-                                  outline = '', style="pieslice",start=self.start,
-                                  extent=360-self.start)
-    def getColour(self):
-        return self.colour
-    
-    def inBounds(self):
-        # figure out
-        pass
-
-#################################################
 # MoodWheel Class
 #################################################
 
@@ -243,28 +256,30 @@ class MoodWheel():
         self.cx = cx
         self.cy = cy
         self.r = r 
-        self.listOfSlices = []
         self.width = 10
+        self.test = 0
 
     def drawColourWheel(self,canvas):
         canvas.create_oval(self.cx-(self.r+10),self.cy-(self.r+10),
                            self.cx+(self.r+10),self.cy+(self.r+10),
                            fill='grey60',width=self.width, outline='grey26')
 
-        # Fix LATER
-        for i in range(0,len(col.coloursList)):
-            degree = PieSlice(self.cx, self.cy, self.r+self.width/2,col.coloursList[i],i)
-            # canvas.create_arc(self.cx-self.r,self.cy-self.r, self.cx+self.r,
-            #                       self.cy+self.r, fill=col.coloursList[i], 
-            #                       outline = '', style="pieslice",start=i,
-            #                       extent=360-i)
-            degree.draw(canvas)
-            self.listOfSlices.append(degree)
+        for i in range(len(col.coloursList)):
+            canvas.create_arc(self.cx-(self.r+self.width/2), self.cy-(self.r+self.width/2), 
+                              self.cx+self.r+self.width/2, self.cy+self.r+self.width/2, 
+                              fill=col.coloursList[i],outline = '', 
+                              style="pieslice",start=i,extent=360-i)
 
-            
+    def getColour(self,x,y):
+        x1,y1 = self.cx,self.cy
+        x2,y2 = self.cx+self.r,self.cy
+        x3,y3 = x, y
+        index = roundHalfUp(cosineLaw(x1,y1,x2,y2,x3,y3))
+        return col.coloursList[index]
+
     def inBounds(self,x,y):
         #NOTE Taken from dot class example
-        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r-16)
+        return (((self.cx - x)**2 + (self.cy - y)**2)**0.5 <= self.r-2*self.width)
 
 #################################################
 # Shape Classes
@@ -325,31 +340,27 @@ class Box():
 #################################################
 
 class Tree:
-    def __init__(self,depth,startx,starty):
-        self.branches = []
-        self.depth = depth
-        self.startx = startx
-        self.starty = starty
-        self.anlgeShift = math.pi/5
-    
-    def drawBranch(self,canvas,depth,x0,y0,x1,y1,step=0,check=0):
-        if depth == step:
-            dr.drawBranch(canvas,x0,y0,x1,y1,step,check)
-        else:
-            #main branch
-            self.drawBranch(canvas,depth,x0,y0,x1,y1,step+1,check+1)
-
-            #left branch
-            xl,yl = branchPoint(x1,y1,(y1-y0)*0.75,'left')
-            self.drawBranch(canvas,depth,x1,y1,xl,yl,step+1,check+2)
-
-            # Right branch
-            xr,yr = branchPoint(x1,y1,(y1-y0)*0.75,'right')
-            self.drawBranch(canvas,depth,x1,y1,xr,yr,step+1,check+2)
-
-    # def drawBranch(self,canvas,depth,ogX,ogY,):
-    #     pass
+    def __init__(self,colour):
+        self.leafColour = colour
  
+    def drawBranch(self,canvas,depth,x0,y0,h,angle,step=0):
+        if depth == 0:
+            x1 = x0+ math.cos(math.radians(angle)) * h
+            y1 = y0 -  math.sin(math.radians(angle)) * h
+            dr.drawBranch(canvas,x0,y0,x1,y1,h,step,self.leafColour)
+        else:
+            # center Branch
+            self.drawBranch(canvas,depth-1,x0,y0,h,angle,step+0.5)
+
+            newx = x0 + math.cos(math.radians(angle)) * h
+            newy = y0 - math.sin(math.radians(angle)) * h
+
+            # right Branch
+            self.drawBranch(canvas,depth-1,newx,newy,h*0.7,angle-30,step+1)
+            # left Branch
+            self.drawBranch(canvas,depth-1,newx,newy,h*0.7,angle+30,step+1)
+
+        pass
 
 
 """THE FOLLOWING CODE IS TEST CODE AND WILL BE REMOVED IN FINAL PRODUCT"""
@@ -380,9 +391,11 @@ def appStarted(app):
     app.jumpCounter = 0
     
 # def redrawAll(app, canvas):
-#     drawPlayer(app,canvas)
-#     tree = Tree(4,app.width/2,750)
-#     tree.drawBranch(canvas,5,app.width/2,790,app.width/2,700)
+#     # drawPlayer(app,canvas)
+#     #drawBranch(self,canvas,depth,x0,y0,h,angle)
+#     tree = Tree('green')
+#     tree.drawBranch(canvas,8,app.width/2,790,200,90)
+#     # (self,canvas,depth,x0,y0,h,angle)
 
 #     for i in range(len(app.words)):
 #         # note this goes in revers

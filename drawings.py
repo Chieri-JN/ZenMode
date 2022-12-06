@@ -62,24 +62,21 @@ def drawGround(canvas,x0,y0,width,y1):
 ##########################################
 # Branch
 ##########################################
-def drawBranch(canvas,x0,y0,x1,y1,step,check):
+def drawBranch(canvas,x0,y0,x1,y1,h,step,lcolour):
     # if step < 5:
     #     colour = "#674119"
     # elif 5 < step < 8:
     #     colour = "#FFB6C1" 
     # else: 
     #     colour = "#FFB6C1"
-    
-    if check % 3 == 0:
-        colour = "blue" 
-    elif check % 3 == 1:
-        colour = "#FFB6C1" 
-    elif check % 3 == 2:
-        colour = "red"
+    if step >= 7:
+        colour = lcolour
+        cap = 'round'
     else:
-        colour = "#674119"
+        colour = "#674119" 
+        cap = 'projecting'
 
-    canvas.create_line(x0,y0,x1,y1, fill=colour,width=((check)))
+    canvas.create_line(x0,y0,x1,y1, fill=colour,width=5*h/15,capstyle=cap)
     # capstyle='round'
 
 

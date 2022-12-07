@@ -20,16 +20,16 @@ dictSynonyms = {
         },
 
     'stressed' : {},
-    'sleepy': {},
+    'excited': {},
     'tired' : {},
     'relaxed' : {},
     'restless' : {},
     'angry' : {},
     'calm' : {},
-    'numb' : {},
+    'curious' : {},
     'irritaded' : {},
     'unimpressed': {},
-    'mellow' : {}
+    'pleased' : {}
     
 }
 
@@ -48,16 +48,17 @@ dicAntonyms = {
         },
 
     'stressed' : {},
-    'sleepy': {},
+    'excited': {},
     'tired' : {},
     'relaxed' : {},
     'restless' : {},
     'angry' : {},
     'calm' : {},
-    'numb' : {},
+    'curious' : {},
     'irritaded' : {},
     'unimpressed': {},
-    'mellow' : {}
+    'pleased' : {}
+
 
 }
 
@@ -68,7 +69,7 @@ dictonaryMood = {
 
     'stressed' : (dictSynonyms['stressed'], dicAntonyms['stressed']),
 
-    'sleepy': (dictSynonyms['sleepy'], dicAntonyms['sleepy']),
+    'excited': (dictSynonyms['excited'], dicAntonyms['excited']),
 
     'tired' : (dictSynonyms['tired'], dicAntonyms['tired']),
 
@@ -80,23 +81,25 @@ dictonaryMood = {
 
     'calm' : (dictSynonyms['calm'], dicAntonyms['calm']),
 
-    'numb' : (dictSynonyms['numb'], dicAntonyms['numb']),
+    'curious' : (dictSynonyms['curious'], dicAntonyms['curious']),
 
     'irritaded' : (dictSynonyms['irritaded'], dicAntonyms['irritaded']),
 
     # this should be an easter egg 'Surely you don't mean by my TP'
     'unimpressed' : (dictSynonyms['unimpressed'], dicAntonyms['unimpressed']), 
 
-    'mellow' : (dictSynonyms['mellow'], dicAntonyms['mellow']),
+    'pleased' : (dictSynonyms['pleased'], dicAntonyms['pleased']),
 
 
 }
 
-dictionaryState = {
+dictionaryType = {
 
-    'Negative': {},
+    'Positive': {'happy','excited','pleased','calm','relaxed','curious'},
 
-    'Positive': {}
+    'Negative': {'sad','stressed','tired','restless','angry','irritated',
+                 'unimpressed'
+                }
 
 }
 

@@ -7,8 +7,6 @@
  
 from cmu_112_graphics import *
 import math
-import random
-import string
 import dictionaries as dict
 import texts_colours as col
 import drawings as dr
@@ -27,24 +25,17 @@ def cosineLaw(x1,y1,x2,y2,x3,y3):
     c = distance(x2,y2, x3,y3)
     flip = 0
     # think of this out of 360 instead
-    if y3>y2: 
-        flip += 90
-    else: 
-        flip += 0
-    if x3 < x1:
-        flip += 90
+    if y3>y2 and x3 < x1: 
+        flip = 90
+    elif y3 > y2 and x1 <= x3 <= x2: 
+        flip = 270
     else:
         flip +=0
-    step1 = (a**2 + b**2 - c**2)/ (2*a*b)
-    gamma =  math.acos(step1)
-    return math.degrees(gamma) + flip
-
-def branchPoint(startx,starty,h,angle):
-    xl = math.cos(math.radians(angle)) * h
-    yl = math.sin(math.radians(angle)) * h
-    newy = starty - yl
-    newx = startx + xl
-    return newx,newy
+    if a != 0 and b != 0: 
+        step1 = (a**2 + b**2 - c**2)/ (2*a*b)
+        gamma =  math.acos(step1)
+        return math.degrees(gamma) + flip
+    return 0
 
 # taken from 15-112 homework 
 import decimal
@@ -90,10 +81,10 @@ class Player():
             canvas.create_image(self.px, self.py-125, image=ImageTk.PhotoImage(sprite))
 
         elif spriteState == 'right':
-            sprite = self.mRSprites[spriteCount]
+            sprite = self.mRSprites[spriteCount%len(self.mRSprites)]
             canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
         elif spriteState == 'left':
-            sprite = self.mLSprites[spriteCount]
+            sprite = self.mLSprites[spriteCount%len(self.mLSprites)]
             canvas.create_image(self.px, self.py, image=ImageTk.PhotoImage(sprite))
 
 
@@ -104,7 +95,7 @@ class Player():
     # NOTE FIX
     def inPlayerBounds(self,x,y):
         return ((self.px - self.pWr <= x <= self.px + self.pWr) and
-                (self.py - self.pHr <= x <= self.py + self.pHr))
+                (self.py - self.pHr == x <= self.py + self.pHr))
 
 #################################################
 # Word Class
@@ -128,6 +119,9 @@ class Word(object):
     def getWord(self):
         return self.word
 
+    def setWord(self,word):
+        self.word = word
+
     def getWordDict(self):
         if self.word in dict.dictonaryMood:
             return dict.dictonaryMood[self.word]
@@ -147,14 +141,13 @@ class Word(object):
         canvas.create_text(x,y, text=f'{self.word}', font=font, fill=colour,
                            justify='center')
 
-class Synonyme(Word): 
-    def __init__(self,type):
-        super.__init__(self.word)
-    # will have the list here either index into tuple or something else.
-    pass
-
-class Antonyme(Word):
-    pass
+    def checkType(self):
+        if self.word in dict.dictionaryType['Negative']:
+            return 'Negative'
+        elif self.word in dict.dictionaryType['Positive']:
+            return 'Positive'
+        else:
+            return None
 
 class WordBubble(Word):
     def __init__(self,word):
@@ -312,7 +305,8 @@ class Circle():
 
 class Dot(Circle):
     # use equality and isinstance
-    pass
+    def getColour(self):
+        return self.colour
 
 class Box():
     def __init__(self,x, y, h, w, colour, outlinewidth, outline):
@@ -354,105 +348,7 @@ class Tree:
 
             newx = x0 + math.cos(math.radians(angle)) * h
             newy = y0 - math.sin(math.radians(angle)) * h
-
             # right Branch
             self.drawBranch(canvas,depth-1,newx,newy,h*0.7,angle-30,step+1)
             # left Branch
             self.drawBranch(canvas,depth-1,newx,newy,h*0.7,angle+30,step+1)
-
-        pass
-
-
-"""THE FOLLOWING CODE IS TEST CODE AND WILL BE REMOVED IN FINAL PRODUCT"""
-
-# for key in dict.dictonaryMood:
-#     testword = Word(key)
-#     print(testword)
-#     print(testword.getWord())
-#     print(testword.getWordDict())
-#     print(testword.getAntonymes())
-#     print('')
-
-
-def mousePressed(app,event):
-    pass
-
-def appStarted(app):
-    app.px = app.width/2
-    app.py = 790
-    app.player = Player(app,app.px,app.py)
-    # app.timerDelay = 1000
-    app.spriteCounter  = 0
-    # app.playerSprites = PlayerSprites(app)[3]
-    app.spriteState = 'idle'
-    app.timerDelay = 300
-
-    app.jumpState = False
-    app.jumpCounter = 0
-    
-# def redrawAll(app, canvas):
-#     # drawPlayer(app,canvas)
-#     #drawBranch(self,canvas,depth,x0,y0,h,angle)
-#     tree = Tree('green')
-#     tree.drawBranch(canvas,8,app.width/2,790,200,90)
-#     # (self,canvas,depth,x0,y0,h,angle)
-
-#     for i in range(len(app.words)):
-#         # note this goes in revers
-#         app.words[i].drawWord(canvas,100,50 + 30*i,'Krungthep 26','red')
-
-def drawPlayer(app,canvas):
-    app.player.drawPlayer(canvas,app.spriteState,app.spriteCounter)
-    
-
-def keyPressed(app,event):
-    if event.key == 'Right':
-        app.spriteState = 'right'
-        app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
-        app.player.movePlayer(10,0)
-        # app.px += 5 
-    elif event.key == 'Left':
-        app.spriteState = 'left'
-        app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
-        app.player.movePlayer(-10,0)
-        # app.px -= 10
-    elif event.key == 'Space':
-        app.spriteState == 'jump'
-        app.jumpState = True
-    elif not event.key:
-        timerFired(app)
-
-def keyReleased(app,event):
-    if event.key == 'Space':
-        app.jumpState = True
-        app.spriteState == 'jump'
-    elif event.key == 'Right':
-        # create r idle
-        app.spriteState = 'idle'
-    elif event.key == 'Left':
-        app.spriteState = 'idleL'
-
-def timerFired(app):
-            if not app.jumpState:
-                if app.spriteState == 'idle':
-                    app.spriteCounter = (1 + app.spriteCounter) % 2
-                elif app.spriteState == 'idleL':
-                     app.spriteCounter = (1 + app.spriteCounter) % 2
-            elif app.jumpState:
-                app.spriteCounter = (1 + app.spriteCounter) % 11
-                app.jumpCounter += 1
-                if app.jumpCounter == 10:
-                    app.jumpState = False
-                    app.jumpCounter = 0
-                    app.spriteState == 'idle'
-
-            # if app.spriteState == 'jump':
-            #     app.timerDelay = 1000
-            #     app.spriteCounter = 0
-            #     while app.spriteCounter < 12:
-            #         app.spriteCounter +=1
-            #     app.spriteState = 'idle'
-            #     app.timerDelay = 200
-
-# runApp(width=800, height=800)
-    

@@ -54,9 +54,15 @@ def drawGround(canvas,x0,y0,width,y1):
             canvas.create_line((30+50*grass)+x0,y0+5 , (30+50*grass)+x0,y0-7 , (33+50*grass)+x0,y0-14, 
                               (40+50*grass)+x0,y0-6,joinstyle='bevel',fill='#194d19',width=4,
                                capstyle='round')
+            canvas.create_line((40+50*grass)-x0,y0-6 , (33+50*grass)-x0,y0-14 , (30+50*grass)-x0,y0-7, 
+                              (30+50*grass)-x0,y0+5,joinstyle='bevel',fill='#194d19',width=4,
+                               capstyle='round')
         if grass % 4 == 2: 
             canvas.create_line((40+50*grass)-x0,y0-6 , (33+50*grass)-x0,y0-14 , (30+50*grass)-x0,y0-7, 
                               (30+50*grass)-x0,y0+5,joinstyle='bevel',fill='#2c872c',width=4,
+                               capstyle='round')
+            canvas.create_line((30+50*grass)+x0,y0+5 , (30+50*grass)+x0,y0-7 , (33+50*grass)+x0,y0-14, 
+                              (40+50*grass)+x0,y0-6,joinstyle='bevel',fill='#2c872c',width=4,
                                capstyle='round')
     
 ##########################################
@@ -69,7 +75,7 @@ def drawBranch(canvas,x0,y0,x1,y1,h,step,lcolour):
     #     colour = "#FFB6C1" 
     # else: 
     #     colour = "#FFB6C1"
-    if step >= 7:
+    if step >= 6:
         colour = lcolour
         cap = 'round'
     else:

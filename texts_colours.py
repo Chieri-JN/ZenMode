@@ -9,8 +9,7 @@ Hit 'F' for something fun. Hit 'H' to return to this info page
 
 helpText2 = """
 Use the 'Left' and 'Right' arrow keys to move your player from side to side. 
-Use the 'Up' arrow key or 'Spacebar' to jump. While in the game hittting 'P' 
-will pause the game. 
+Use the 'Spacebar' to jump. While in the game hittting 'P' will pause the game. 
 """
 
 
@@ -24,12 +23,6 @@ Hit 'Return' to restart the game
 Hit 'Escape' to return to start screen
 Hit 'q' to quit
 """
-
-
-quiz1Text1 = """
-
-"""
-
 
 
 colours = """#ff0000
@@ -767,8 +760,6 @@ pastelColours ="""#A8B8FE
 pastelColoursList = []
 for colour in pastelColours.splitlines():
     pastelColoursList.append(colour)
-
-# print(pastelColoursList)
 
 pastelColoursTwo = """#CAFFA3
 #D4FFA1

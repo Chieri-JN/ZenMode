@@ -655,6 +655,11 @@ def endGame_keyPressed(app,event):
         app.mode = 'startScreen'
         app._title = 'ZenMode'
         app.gameStarted = False
+        app.Points = 0
+        app.CounterPoints = 0
+        app.Score = 0
+        app.gameOver = False
+        app.riskOfLoss = False
     elif event.key == 'q':
         app.quit()
         print('You quit ZenMode! Hope you had fun! :)')

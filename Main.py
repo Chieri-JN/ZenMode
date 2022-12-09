@@ -40,10 +40,6 @@ def circlesIntersect(x1, y1, r1, x2, y2, r2):
 def perfElasticCollision(x1,y1,x2,y2):
     pass
 
-##########################################
-# Main App
-##########################################
-
 # for buttons
 def switchMode(app,mode,colour,title):
     app.screenColour = colour
@@ -52,6 +48,9 @@ def switchMode(app,mode,colour,title):
     app.tick = 0
     app.circlex = app.centerx-300
     app.circley = 550
+##########################################
+# Main App
+##########################################
     
 def appStarted(app):
     app.mode = 'startScreen'
@@ -71,7 +70,6 @@ def appStarted(app):
     
     # startScreen unique App values 
     app.Startbuttons = []
-    # NOTE WIll not respond when mouse hovers over txt
     app.startButton = cl.Button(app.centerx, 500, 85, 220,'#85daa2','#a9e5bd',5,
                             'white','Start','Krungthep 50')
     app.helpButton = cl.Button(app.centerx, 650, 85, 200,'#85daa2','#a9e5bd',5,
@@ -209,19 +207,11 @@ def appStarted(app):
     app.gameWordBubbleList  = []
     app.Synonymes = app.selectedWord.getSynonymes()
     app.Antonymes = app.selectedWord.getAntonymes()
+    app.list = list(app.Synonymes)
     app.WordCheck = True
     app.gameWBr = 50
-    app.list = list(app.Synonymes)
     app.WBshift = 0
-    
-
-    # for wb in app.gameWordBubbleList:
-    #     wb.cy = 0
-    #     wb.cx = random.randrange(app.WorldWidthLeft + app.WorldMargine,app.WorldWidthRight - app.WorldMargine)
-    # random.randrange(app.WorldWidthLeft+20,app.WorldWidthRight-20)
-    # NOTE change to a little over the width of world bubbles
-    # NOTE TEMPORY VARIABLE
-    app.wordPos = random.randrange(app.WorldWidthLeft+20,app.WorldWidthRight-20)
+    app.WordCheckTwo = True
 
 ##########################################
 # Start Screen
@@ -236,7 +226,6 @@ def startScreen_redrawAll(app,canvas):
     for button in app.Startbuttons:
         button.draw(canvas)
 
-    # NOTE draw tree in between words 
     # Title
     title1.drawWord(canvas,app.centerx-263,200,'K2D 220','grey54') #shadow
     title1.drawWord(canvas,app.centerx-270,200,'K2D 220','white')
@@ -247,7 +236,7 @@ def startScreen_keyPressed(app,event):
     if event.key == 'Return':
         app.screenColour = '#ffbe60'
         app.mode = 'quizScreenOne'
-        app._title = 'quizScreen1' # test
+        app._title = 'quizScreen1' 
     elif event.key == 'Space':
         app.screenColour = '#ffbe60'
         app.mode = 'quizScreenOne'
@@ -278,7 +267,6 @@ def startScreen_timerFired(app):
 
 # NOTE Have balls, randomly generated and drifting across screen, slightly light/
 # darker than actually bg colour() in sinusoidal pattern
-# OR have bg be paler shade(pastel) of circle colour  
 
 ##########################################
 # Quiz Screens / Start Mode
@@ -286,7 +274,6 @@ def startScreen_timerFired(app):
 
 # Mood Wheel (colour wheel)
 ##########################################
-# drawWord(self, canvas, x, y, font, colour)
 def quizScreenOne_redrawAll(app,canvas):
     canvas.create_rectangle(0,0,app.width,app.height,fill=app.screenColour)
     app.mood1.drawColourWheel(canvas)
@@ -346,7 +333,6 @@ def quizScreenOne_mousePressed(app,event):
     if app.circle1.inBounds(event.x,event.y):
         app.followMouse = True
 
-# NOTE USED TO move across screens, will remove later
 def quizScreenOne_keyPressed(app,event):
     # Shortcut commands
     if event.key == 'Left':
@@ -390,7 +376,7 @@ def drawH3(app,canvas):
     header4.drawWord(canvas,app.centerx+336,360,'K2D 50',app.selectedColour)
     
 def redrawWords(app,canvas):
-    for i in range(len(app.selectedWBList)):# app.wordBubbleList: 
+    for i in range(len(app.selectedWBList)):
         wb = app.selectedWBList[i]
         if len(app.selectedWBList[i].getWord()) > 8: 
             app.selectedWBList[i].draw(canvas,('Baloo Bhaijaan','12'),app.wbx + 108*i, app.wby + 65*i, 
@@ -437,6 +423,7 @@ def quizScreenTwo_mousePressed(app,event):
         if wb.inBounds(event.x,event.y):
             app.selectedWord.setWord(wb.getWord())
             app.selectedColour = wb.getColour()
+            print(app.selectedWord.getWord())
     
 
 def quizScreenTwo_keyPressed(app,event):
@@ -468,9 +455,7 @@ def quizScreenThree_redrawAll(app,canvas):
 
 def drawStartButton(app,canvas):
     for button in app.quiz3Buttons:
-        button.draw(canvas)
-
-# calculates time betweent the apperance 
+        button.draw(canvas) 
 
 def drawDots(app,canvas):
     for dot in app.dots: 
@@ -508,8 +493,6 @@ def quizScreenThree_timerFired(app):
         app.playerTime += 1
     if app.checkCount < 5:
         app.fastestTime += 1
-        # get players time and divide this by that
-
 
 def quizScreenThree_keyPressed(app,event):
     # Shortcut commands
@@ -585,7 +568,7 @@ def pauseScreen_keyPressed(app,event):
  
 def pauseScreen_mousePressed(app,event):
     if app.pauseHelpButton.inBounds(event.x, event.y):
-        app.gameStarted = True # NOTE REMOVE 
+        app.gameStarted = True 
         app.startButton.buttonPressed(switchMode(app,'helpScreen','#96c9a6','helpScreen'))
         print('Help button pressed!')
 
@@ -617,7 +600,7 @@ def endGame_redrawAll(app,canvas):
         T1colour1 = 'dark goldenrod'
         T1colour2 = 'gold'
         T2colour1 = 'grey56'
-        T2colour2 = 'white'
+        T2colour2 = 'white' 
     elif app.gameOutcome == 'Loss':
         textSize = 170
         textSize2 = 100
@@ -648,10 +631,9 @@ def endGame_redrawAll(app,canvas):
     header1.drawWord(canvas,app.centerx,150,f'K2D {textSize}',T1colour1) # shadow
     header1.drawWord(canvas,app.centerx-4,150,f'K2D {textSize}',T1colour2)
 
-    # NOTE CHANGE FONT
     header2.drawWord(canvas,app.centerx,350,f'K2D {textSize2}',T2colour1)# shadow
     header2.drawWord(canvas,app.centerx-3,350,f'K2D {textSize2}',T2colour2)# shadow
-    # NOTE CHANGE FONT
+ 
     header3.drawWord(canvas,app.centerx,550,f'K2D {textSize3}','black')
 
     text = cl.Word(tx.endGameText)
@@ -665,12 +647,14 @@ def endGame_keyPressed(app,event):
         app.Points = 0
         app.CounterPoints = 0
         app.Score = 0
-        app.gameOver == False
+        app.gameOver = False
+        app.riskOfLoss = False
 
     elif event.key == 'Escape':
         app.screenColour = "#c8eed5"
         app.mode = 'startScreen'
         app._title = 'ZenMode'
+        app.gameStarted = False
     elif event.key == 'q':
         app.quit()
         print('You quit ZenMode! Hope you had fun! :)')
@@ -686,6 +670,9 @@ def endGame_timerFired(app):
 ##########################################
 def gameScreen_appStarted(app):
     app.timerDelay = 100
+    app.Synonymes = app.selectedWord.getSynonymes()
+    app.Antonymes = app.selectedWord.getAntonymes()
+    app.list = list(app.Synonymes)
     pass
 
 def gameScreen_redrawAll(app,canvas):
@@ -724,7 +711,6 @@ def drawTree(app,canvas,depth):
     app.tree.drawBranch(canvas,app.treeDepth,app.centerx,app.ground,app.treeHeight,app.treeAngle)
 
 def drawBackground(app,canvas):
-    # Add clouds
     canvas.create_rectangle(app.WorldWidthLeft+app.worldShift ,0, app.WorldWidthRight+app.worldShift
                             ,app.height, fill=app.screenColour)
 
@@ -733,7 +719,6 @@ def drawWorld(app,canvas):
                   app.WorldWidthRight+app.worldShift, app.height)
 
 def drawWords(app,canvas):
-    #  draw(self,canvas,font,cx,cy,r,colour,width,outline)
     for wb in  app.gameWordBubbleList:
         wb.draw(canvas,('Baloo Bhaijaan','16'),wb.cx + app.WBshift,wb.cy,app.gameWBr,wb.colour,10,'grey40')
 
@@ -764,7 +749,7 @@ def gameScreen_keyPressed(app,event):
     elif (event.key == "Right"): 
         if app.PcurrDistfromWR <= app.WorldWidthRight:
             app.spriteState = 'right'
-            app.spriteCounter = (1 + app.spriteCounter) % 7 # change later
+            app.spriteCounter = (1 + app.spriteCounter) % 7 
             app.player.movePlayer(10,0)
             app.PcurrDistfromWR += 10
             app.PcurrDistfromWL += 10
@@ -783,7 +768,7 @@ def gameScreen_keyPressed(app,event):
         
     elif (event.key == "Space"):    
         app.spriteState = 'jump'
-        app.spriteCounter = 1 # change later
+        app.spriteCounter = 1 
     elif event.key == 'p':
         app.screenColour = 'grey74'
         app.mode = 'pauseScreen'
@@ -830,10 +815,15 @@ def gameScreen_keyReleased(app,event):
         app.prevIdle = 'idleL'
         app.WBshift = 0
     elif not event.key:
-        gameScreen_timerFired() # app.?
+        gameScreen_timerFired()
 
 def gameScreen_timerFired(app):
     app.tick += 1
+    if app.WordCheckTwo:
+        app.Synonymes = app.selectedWord.getSynonymes()
+        app.Antonymes = app.selectedWord.getAntonymes()
+        app.list = list(app.Synonymes)
+        app.WordCheckTwo = False
     # Game State Conditions
     if app.Score >= 1:
         app.riskOfLoss = True
@@ -842,7 +832,7 @@ def gameScreen_timerFired(app):
         if app.Score == 0:
             app.gameOver = True 
             app.gameOutcome = 'Loss'
-    if app.Score >= 14:
+    if app.Score >= 16:
         app.gameOver = True 
         app.gameOutcome = 'Win'
     elif app.Score < 0:
@@ -855,9 +845,6 @@ def gameScreen_timerFired(app):
     if app.tick >= 50: 
         app.drawWordType = False
 
-    # have app.treeDepth tick away in decimals or have counter
-    # difficulty scaling will be how quickly the shrink rate is so how quickly will
-    # the tree depth decrease
     # Point State Conditions: 
     if app.gameOver == False:
         if app.Points % 2 == 0 and app.Points != 0: 
@@ -883,15 +870,10 @@ def gameScreen_timerFired(app):
                 app.spriteCounter = (1 + app.spriteCounter) % 2
         elif app.spriteState == 'idleL':
                 app.spriteCounter = (1 + app.spriteCounter) % 2
-        # if app.jumpState=='False':
-        #     if app.spriteState == 'idle':
-        #         app.spriteCounter = (1 + app.spriteCounter) % 2
-        #     elif app.spriteState == 'idleL':
-        #             app.spriteCounter = (1 + app.spriteCounter) % 2
         if app.jumpState:
             app.spriteCounter = (1 + app.spriteCounter) % 11
             app.jumpCounter += 1
-            app.JumpComp = 50
+            app.JumpComp = -100
             if app.jumpCounter == 10:
                 app.jumpCounter = 0
                 app.spriteCounter = 0
@@ -906,8 +888,7 @@ def gameScreen_timerFired(app):
             wb.Move(0,app.fallSpeed)
             if wb.inBounds(wb.cx,app.ground):
                 app.gameWordBubbleList.remove(wb)
-            if wb.inBounds(app.player.px,app.ground-40):
-                # if type == 'Synonymes':
+            if wb.inBounds(app.player.px,app.ground-40+app.JumpComp):
                 if app.selectedWord.checkType() == 'Negative':
                     if wb.getWord() in app.selectedWord.getAntonymes():
                         app.Score += 1
@@ -938,11 +919,12 @@ def spawnWord(app):
     else:
         app.list = list(app.Synonymes)
         app.WordCheck = True
-    newWB = cl.WordBubble(random.choice(app.list))
-    newWB.cy = 0
-    newWB.colour = random.choice(col.pastelColoursTwoList)
-    newWB.cx = random.randrange(app.WorldWidthLeft + app.WorldMargine,app.WorldWidthRight - app.WorldMargine)
-    app.gameWordBubbleList.append(newWB)
+    if len(app.list) > 0:
+        newWB = cl.WordBubble(random.choice(app.list))
+        newWB.cy = 0
+        newWB.colour = random.choice(col.pastelColoursTwoList)
+        newWB.cx = random.randrange(app.WorldWidthLeft + app.WorldMargine,app.WorldWidthRight - app.WorldMargine)
+        app.gameWordBubbleList.append(newWB)
 
 def gameScreen_mousePressed(app,event):
     pass

@@ -24,17 +24,19 @@ def cosineLaw(x1,y1,x2,y2,x3,y3):
     b = distance(x3,y3, x1,y1)
     c = distance(x2,y2, x3,y3)
     flip = 0
-    # think of this out of 360 instead
+    sign =1
     if y3>y2 and x3 < x1: 
-        flip = 90
+        flip = 360
+        sign= -1
     elif y3 > y2 and x1 <= x3 <= x2: 
-        flip = 270
+        flip = 360
+        sign = -1
     else:
         flip +=0
     if a != 0 and b != 0: 
         step1 = (a**2 + b**2 - c**2)/ (2*a*b)
         gamma =  math.acos(step1)
-        return math.degrees(gamma) + flip
+        return math.degrees(gamma)*sign + flip
     return 0
 
 # taken from 15-112 homework 
@@ -48,7 +50,6 @@ def roundHalfUp(d):
 #################################################
 # Player Class
 #################################################
-# TODO INCORPERATE BOUNDS
 
 class Player():
     def __init__(self,app,px, py):
@@ -66,8 +67,6 @@ class Player():
         self.jumpSprites = dr.PlayerSprites(app)[2]
         self.mRSprites = dr.PlayerSprites(app)[3]
         self.mLSprites = dr.PlayerSprites(app)[4]
-        # self.sprS = spriteState # dictates what the player is doing
-        # self.sprC = spriteCount
 
     def drawPlayer(self,canvas,spriteState,spriteCount):
         if spriteState == 'idle':
@@ -92,7 +91,6 @@ class Player():
         self.px += dx
         self.py += dy
     
-    # NOTE FIX
     def inPlayerBounds(self,x,y):
         return ((self.px - self.pWr <= x <= self.px + self.pWr) and
                 (self.py - self.pHr == x <= self.py + self.pHr))

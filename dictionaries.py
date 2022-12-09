@@ -19,15 +19,32 @@ dictSynonyms = {
          'depressed'
         },
 
-    'stressed' : {},
-    'excited': {},
-    'tired' : {},
-    'relaxed' : {},
+    'stressed' :
+        {
+         'harassed', 'harrowed','peaked','pinched','sapped','starved',
+         'strained','thin','tired','worn','fraught','haggard'
+        },
+    'excited': 
+        {
+          'thrilled', 'pumped', 'eager', 'keen', 'ready', 'ardent', 'zealous', 
+          'happy' 
+        },
+    'tired' : 
+        {
+         'drainrd', 'slow', 'lethargic', 'sleepy', 'faint', 'droopy', 'weary', 
+         'beat', 'lethargic'
+        },
+
+    'relaxed' : 
+        {'easeful', 'easygoing','rested','fresh','unconcerned','carefree',
+         'lighthearted','laid-back'
+        },
+
     'restless' : {},
     'angry' : {},
     'calm' : {},
     'curious' : {},
-    'irritaded' : {},
+    'irritated' : {},
     'unimpressed': {},
     'pleased' : {}
     
@@ -40,22 +57,33 @@ dicAntonyms = {
          'sorrowful', 'troubled', 'unhappy', 'upset', 'discouraged'
         },
  
-
     'sad':
         {
          'cheerful','glad','happy','hopeful', 'joyful', 'cheerful', 'overjoyed',
          'joyful'
         },
 
-    'stressed' : {},
-    'excited': {},
-    'tired' : {},
-    'relaxed' : {},
+    'stressed' : 
+        {
+         'rested','fresh','relaxed','unconcerned','carefree','lighthearted','laid-back'
+        },
+
+    'excited': {'bored', 'tired', 'jaded', 'aloof', 'placid' , 'uniterested'},
+    'tired' : 
+        {
+         'thrilled', 'pumped', 'eager', 'keen', 'ready', 'ardent', 'zealous', 
+         'happy' 
+        },
+    'relaxed' : 
+        {
+         'harassed', 'harrowed','peaked','pinched','sapped','starved',
+         'strained','thin','tired','worn','fraught','haggard'
+        },
     'restless' : {},
     'angry' : {},
     'calm' : {},
     'curious' : {},
-    'irritaded' : {},
+    'irritated' : {},
     'unimpressed': {},
     'pleased' : {}
 
@@ -83,9 +111,8 @@ dictonaryMood = {
 
     'curious' : (dictSynonyms['curious'], dicAntonyms['curious']),
 
-    'irritaded' : (dictSynonyms['irritaded'], dicAntonyms['irritaded']),
+    'irritated' : (dictSynonyms['irritated'], dicAntonyms['irritated']),
 
-    # this should be an easter egg 'Surely you don't mean by my TP'
     'unimpressed' : (dictSynonyms['unimpressed'], dicAntonyms['unimpressed']), 
 
     'pleased' : (dictSynonyms['pleased'], dicAntonyms['pleased']),
@@ -102,6 +129,4 @@ dictionaryType = {
                 }
 
 }
-
-
 

@@ -7,8 +7,6 @@
 
 from cmu_112_graphics import *
 import random 
-import string
-import math
 
 ##########################################
 # Helper Functions
@@ -69,12 +67,6 @@ def drawGround(canvas,x0,y0,width,y1):
 # Branch
 ##########################################
 def drawBranch(canvas,x0,y0,x1,y1,h,step,lcolour):
-    # if step < 5:
-    #     colour = "#674119"
-    # elif 5 < step < 8:
-    #     colour = "#FFB6C1" 
-    # else: 
-    #     colour = "#FFB6C1"
     if step >= 6:
         colour = lcolour
         cap = 'round'
@@ -138,34 +130,3 @@ def PlayerSprites(app):
         left.append(sprite)
 
     return {0:idle,1:idleR,2:jump,3:right,4:left}
-
-
-
-"""TEST CODE"""
-
-# def appStarted(app):
-#     # app.timerDelay = 1000
-#     app.spriteCounter  = 0
-#     app.playerSprites = PlayerSprites(app)[3]
-#     app.spriteCounter2  = 0
-#     app.playerSprites2 = PlayerSprites(app)[2]
-#     pass
-
-# def redrawAll(app,canvas):
-#     sprite = app.playerSprites[app.spriteCounter]
-#     sprite2 = app.playerSprites2[app.spriteCounter2]
-#     canvas.create_image(app.width/2, app.height/2+200, image=ImageTk.PhotoImage(sprite))
-#     canvas.create_image(app.width/2, app.height/2, image=ImageTk.PhotoImage(sprite2))
-#     pass
-
-
-# def timerFired(app):
-#     app.spriteCounter = (1 + app.spriteCounter) % len(app.playerSprites)
-#     app.spriteCounter2 = (1 + app.spriteCounter2) % len(app.playerSprites2)
-#     # print(len(PlayerSprites(app)[1]))
-# #      drawBranch(canvas,app.width/2,780,app.width/2,700,5)
-#     pass
-
-
-# runApp(width=800, height=800)
-

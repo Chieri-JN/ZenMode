@@ -53,7 +53,7 @@ def switchMode(app,mode,colour,title):
 ##########################################
     
 def appStarted(app):
-    app.mode = 'startScreen'
+    app.mode = 'quizScreenOne'
     app._title = 'ZenMode'
     # NOTE ORIGINAL #c8eed5
     app.screenColour = "#c8eed5"
@@ -258,7 +258,6 @@ def startScreen_mousePressed(app,event):
         print('Help button pressed!')
 
 def bgColourChange(app):
-    # NOTE Switch to Dictionary 
     return col.pastelColoursList[app.tick%len(col.pastelColoursList)]
 
 def startScreen_timerFired(app):

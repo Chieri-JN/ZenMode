@@ -17,8 +17,8 @@ def HextoRGB(hexColour):
     return(r,g,b)
 
 # NOTE MODIDY PARAMETERS IF NEEDED
-def drawRandomShapes(shape,rate,bounds):
-    pass
+# def drawRandomShapes(shape,rate,bounds):
+#     pass
 
 ##########################################
 # Background Trees

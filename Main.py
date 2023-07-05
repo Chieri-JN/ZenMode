@@ -821,6 +821,7 @@ def gameScreen_keyReleased(app,event):
     elif not event.key:
         gameScreen_timerFired()
 
+# Need to Debug
 def gameScreen_timerFired(app):
     app.tick += 1
     if app.WordCheckTwo:
@@ -854,7 +855,8 @@ def gameScreen_timerFired(app):
         if app.Points % 2 == 0 and app.Points != 0: 
             app.Points = 0
             app.treeDepth += 1
-
+        
+        # check for weird behaviour
         if app.CounterPoints % 2 == 0 and app.CounterPoints != 0:
             app.CounterPoints = 0
             app.treeDepth -= 1
